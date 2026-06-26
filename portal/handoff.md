@@ -63,6 +63,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 - Products → `data_loader.py` `STEEL_PRODUCTS`
 - Users → `auth.py` `USERS` + `DEMO_CREDENTIALS`
 - Analyst content → `app.py` `page_analyst()` placeholders (headline `summary` per call + the `CALL_SECTIONS` one-line breakdown: Flats/Longs/Raw materials/Imports & exports/Outlook)
+- Methodology page content (pipeline steps, factors, horizons, stats) → `app.py` `page_methodology()` (`steps`/`factors` lists + inline HTML); infographic styling → `theme.py` `.bm-meth-*`/`.bm-flow*`/`.bm-factor*`/`.bm-horizon*`
 - Forecast rationale text → `app.py` `RATIONALES` dict (add a key per product name; `_default` is the placeholder shown until then)
 - Forecasting Graphical/Tabular tabs → `app.py` `page_forecasting()` `st.tabs([...])` block
 - History window (chart + historical table, kept in sync) → `app.py` `HIST_WEEKS` constant (currently 26)
@@ -84,6 +85,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
+- **New Methodology page (infographic-led)** — added a 6th top-nav page **Methodology** (`NAV` + `top_nav` widened to 6 cols + `PAGES` + `page_methodology()` in `app.py`; `schema` material icon). General (not per-product) methodology generalised from bigmint.co: gradient **hero**, **stat strip** (~98% accuracy / 15+ yrs data / 1–2% delta / IOSCO-audited), a 6-step **pipeline flow** infographic (Market data → Signal engineering → ML + sentiment → Ensemble → 12-wk forecast → Accuracy tracking), 6 **key-factor** cards (cost drivers, upstream–downstream, global prices, supply & demand, macro, sentiment), 3 **forecast-horizon** cards (short=weekly/monthly, mid=quarterly/monthly, long=annual/quarterly), transparency/IOSCO cards, and a limitations disclaimer. All HTML/CSS infographics — new `.bm-meth-hero`, `.bm-stat*`, `.bm-flow*`, `.bm-factor*`, `.bm-horizon*` classes in `theme.py` (responsive grid collapses at 760px). NB: Home still shows 4 module cards (no Methodology card) — discoverable via the nav only. → `app.py`, `theme.py`.
 - **Branding renamed → "Price Forecasting: Steel"** — product title changed from "Steel Price Forecasting Model" everywhere it's shown: browser tab `page_title`, login caption, Home header (`app.py`), and the topbar portal title "AI Labs — Price Forecasting: Steel" (`theme.py`). Also updated the `app.py` docstring, `README.md` and this handoff's title/locked-decision line. (Earlier same-day entries still reference the old name as historical record.)
 - **Login — Demo credentials section removed** — dropped the "Demo credentials" expander (username/password list) from `login_screen()`. `auth.DEMO_CREDENTIALS` is now unused by the app but **left defined in `auth.py`** (documents the demo logins; re-add the expander to surface it again). → `app.py` `login_screen()`.
 - **Home KPI relabel** — the 4th overview KPI label "Last actual" → **"Last updated on"** (value/sublabel unchanged: most-recent assessment date). → `app.py` `page_home()`.

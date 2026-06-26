@@ -117,6 +117,27 @@ div[class*="st-key-homemod_"] button em {{
     font-size:13px; letter-spacing:.3px; margin-top:14px;
 }}
 
+/* ---------- home Methodology banner (full-width button spanning the 4 cards) ---------- */
+div[class*="st-key-home_methodology"] {{ margin-top:14px; }}
+div[class*="st-key-home_methodology"] button {{
+    width:100%; min-height:62px; flex-direction:row; align-items:center; justify-content:flex-start;
+    gap:14px; text-align:left; white-space:normal; padding:16px 24px; border-radius:16px;
+    border:none !important; color:#fff !important; font-weight:400;
+    background:linear-gradient(120deg,{PRIMARY} 0%,{PRIMARY_DARK} 100%) !important;
+    box-shadow:0 4px 16px rgba(2,76,161,.20); transition:transform .18s ease, box-shadow .18s ease;
+}}
+div[class*="st-key-home_methodology"] button:hover {{
+    transform:translateY(-2px); box-shadow:0 12px 28px rgba(2,76,161,.30);
+}}
+div[class*="st-key-home_methodology"] button [data-testid="stIconMaterial"] {{
+    font-size:26px !important; width:26px; height:26px; color:#fff;
+}}
+div[class*="st-key-home_methodology"] button strong {{ font-size:16px; color:#fff; font-weight:700; }}
+div[class*="st-key-home_methodology"] button p {{ font-size:13px; color:#dce8f8; margin:0; font-weight:400; }}
+div[class*="st-key-home_methodology"] button em {{
+    font-style:normal; font-weight:700; color:#fff; font-size:13px; letter-spacing:.3px;
+}}
+
 /* ---------- direction chips ---------- */
 .dir-chip {{ font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; white-space:nowrap; display:inline-block; }}
 .dir-up   {{ background:#e7f6ee; color:{SUCCESS}; }}

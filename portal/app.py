@@ -16,10 +16,8 @@ import auth
 import data_loader as dl
 from calculators import calc_import_price, calc_cost, calc_elasticity
 
-BIGMINT_URL = "https://www.bigmint.co/"
-
 st.set_page_config(
-    page_title="BigMint - AI Labs | Steel Price Forecasting",
+    page_title="BigMint × Adani | Steel Price Forecasting",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -35,7 +33,7 @@ def login_screen():
     with cols[1]:
         with st.container(border=True):
             st.markdown("### Sign in")
-            st.caption("Bigmint - AI Labs Steel Price Forecasting Model")
+            st.caption("BigMint × Adani — Steel Price Forecasting Model")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             if st.button("Sign in", use_container_width=True, type="primary"):
@@ -59,7 +57,14 @@ if "user" not in st.session_state:
 
 user = st.session_state.user
 st.session_state.setdefault("page", "Home")
-theme.render_topbar(user)
+
+# header: brand bar + a primary "Log out" button (same design as Sign in) pinned top-right
+hcol1, hcol2 = st.columns([6, 1], vertical_alignment="center")
+with hcol1:
+    theme.render_topbar(user)
+with hcol2:
+    if st.button("Log out", key="logout_top", type="primary", use_container_width=True, icon=":material/logout:"):
+        auth.logout()
 
 
 # ---------------------------------------------------------------------------
@@ -75,15 +80,13 @@ NAV = [
 
 
 def top_nav():
-    cols = st.columns([1, 1.35, 1.35, 1.3, 1.3, 1])
+    cols = st.columns([1, 1.35, 1.35, 1.3, 1.3])
     for i, (name, label, mi) in enumerate(NAV):
         active = st.session_state.page == name
         if cols[i].button(f":material/{mi}: {label}", key=f"nav_{name}",
                           type="primary" if active else "secondary", use_container_width=True):
             st.session_state.page = name
             st.rerun()
-    if cols[-1].button(":material/logout: Log out", key="nav_logout", use_container_width=True):
-        auth.logout()
 
 
 top_nav()
@@ -212,11 +215,59 @@ def delta_bar(view):
         st.bar_chart(view.set_index("Date")[["Delta"]])
 
 
+def accuracy_chart(view):
+    """Per-week forecast accuracy (%) = 100 - |forecast-vs-spot % error|."""
+    try:
+        import plotly.graph_objects as go
+        acc_pct = 100 - view["DeltaPct"].abs()
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=[_dt(d) for d in view["Date"]], y=list(acc_pct), name="Accuracy",
+            mode="lines+markers", line=dict(color=theme.SUCCESS, width=2.6, shape="spline", smoothing=0.4),
+            marker=dict(size=6, color=theme.SUCCESS, line=dict(width=4, color="rgba(31,157,85,0.16)")),
+            hovertemplate="%{x|%d-%b-%y}<br><b>Accuracy: %{y:.1f}%</b><extra></extra>",
+            hoverlabel=dict(bgcolor="white", bordercolor="#cdeedd", font=dict(color=theme.SUCCESS))))
+        f = _style_fig(fig, height=300, money=False)
+        f.update_yaxes(ticksuffix="%")
+        _render_with_highlighter(f, height=300, dom_id="acc_chart")
+    except Exception:
+        st.line_chart((100 - view["DeltaPct"].abs()).to_frame("Accuracy %").set_index(view["Date"]))
+
+
+def directional_accuracy_bar(view):
+    """Per-week directional call: correct (up bar, green) vs wrong (down bar, red)."""
+    try:
+        import plotly.graph_objects as go
+        ys, colors, texts = [], [], []
+        for i, r in enumerate(view.itertuples()):
+            if i == 0:                       # first week has no prior reference (matches KPI logic)
+                ys.append(0); colors.append(theme.NEUTRAL)
+                texts.append("No prior reference")
+                continue
+            hit = bool(r.Hit)
+            ys.append(1 if hit else -1)
+            colors.append(theme.SUCCESS if hit else theme.DANGER)
+            texts.append(f"Predicted {r.PredDir} &middot; Actual {r.ActualDir} &middot; {'Correct' if hit else 'Wrong'}")
+        fig = go.Figure(go.Bar(x=view["Date"], y=ys, marker_color=colors, customdata=texts,
+                               hovertemplate="%{customdata}<extra></extra>"))
+        fig.update_layout(height=200, margin=dict(l=8, r=8, t=8, b=8),
+                          plot_bgcolor="white", paper_bgcolor="rgba(0,0,0,0)", dragmode=False,
+                          hovermode="x unified", bargap=0.45,
+                          hoverlabel=dict(bgcolor="white", bordercolor="#e2e8f0"),
+                          font=dict(size=11, color="#334155"))
+        fig.update_yaxes(tickvals=[-1, 1], ticktext=["Wrong", "Correct"], range=[-1.4, 1.4],
+                         gridcolor="#eef2f7", zeroline=True, zerolinecolor="#cbd5e1")
+        fig.update_xaxes(gridcolor="rgba(0,0,0,0)")
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+    except Exception:
+        st.bar_chart(view.assign(Correct=view["Hit"].astype(int)).set_index("Date")[["Correct"]])
+
+
 # ---------------------------------------------------------------------------
 # PAGE: HOME
 # ---------------------------------------------------------------------------
 def page_home():
-    st.markdown("## Bigmint - AI Labs Steel Price Forecasting Model")
+    st.markdown("## BigMint × Adani — Steel Price Forecasting Model")
     st.markdown(f"Welcome, **{user['name']}**. Six steel products, 12-week Ensemble forecasts and week-wise accuracy.")
     st.write("")
 
@@ -239,30 +290,20 @@ def page_home():
 
     st.write("")
     theme.section_title("Modules", theme.icon("home"))
-    c1, c2, c3 = st.columns(3)
-    cards = [
-        (c1, "Price forecasting", "Spot vs 12-week forecast for six steel products, plus the raw-material feed.", theme.icon("trending"), "Price Forecasting"),
-        (c2, "Analyst calls", "Monthly market-outlook calls, key insights and downloadable decks.", theme.icon("mic"), "Analyst Calls"),
-        (c3, "Performance", "Week-wise accuracy: spot, forecast, delta and direction.", theme.icon("gauge"), "Performance Dashboard"),
+    modules = [
+        ("Price forecasting", "Spot vs 12-week Ensemble forecast for the six steel products.", "trending_up", "Price Forecasting"),
+        ("Analyst calls", "Monthly market-outlook calls, key insights and downloadable decks.", "campaign", "Analyst Calls"),
+        ("Performance", "Week-wise accuracy: spot, forecast, delta and direction.", "insights", "Performance Dashboard"),
+        ("Calculators", "Import vs landed-cost, production cost & margin, and price-elasticity tools.", "calculate", "Calculators"),
     ]
-    for col, title, desc, ic, target in cards:
+    for col, (title, desc, mi, target) in zip(st.columns(4), modules):
         with col:
-            st.markdown(theme.module_card(title, desc, ic), unsafe_allow_html=True)
-            if st.button(f"Open {title.split()[0].lower()}", key=f"home_{target}", use_container_width=True):
+            # whole card is one clickable button (styled via .st-key-homemod_* in theme.py)
+            # label = **title** (strong/block) + brief (p text) + *Open ->* (em/block CTA)
+            if st.button(f"**{title}** {desc} *Open →*", key=f"homemod_{target.replace(' ', '_')}",
+                         icon=f":material/{mi}:", use_container_width=True):
                 st.session_state.page = target
                 st.rerun()
-
-    st.write("")
-    cc1, cc2 = st.columns([2, 1])
-    with cc1:
-        st.markdown(theme.module_card("Calculators",
-                    "Import vs landed-cost, production cost & margin, and price-elasticity tools.",
-                    theme.icon("calculator")), unsafe_allow_html=True)
-    with cc2:
-        st.write("")
-        if st.button("Open calculators", key="home_calc", use_container_width=True, type="primary"):
-            st.session_state.page = "Calculators"
-            st.rerun()
     theme.footer()
 
 
@@ -271,70 +312,56 @@ def page_home():
 # ---------------------------------------------------------------------------
 def page_forecasting():
     st.markdown("## Price forecasting")
-    tab_steel, tab_raw = st.tabs(["Steel price forecast", "Raw-material price forecast"])
+    product = st.segmented_control("Product", list(dl.STEEL_PRODUCTS.keys()),
+                                   default="HRC", key="fc_prod", label_visibility="collapsed")
+    product = product or "HRC"
+    meta = dl.STEEL_PRODUCTS[product]
+    summary = dl.load_summary()
+    row = dl.summary_row(summary, meta["ff"])
+    fwd = dl.load_forward(meta["ff"])
 
-    with tab_steel:
-        product = st.segmented_control("Product", list(dl.STEEL_PRODUCTS.keys()),
-                                       default="HRC", key="fc_prod", label_visibility="collapsed")
-        product = product or "HRC"
-        meta = dl.STEEL_PRODUCTS[product]
-        summary = dl.load_summary()
-        row = dl.summary_row(summary, meta["ff"])
-        fwd = dl.load_forward(meta["ff"])
+    if row:
+        last_actual = row.get("Last actual (Rs./ton)", row.get("Last actual (₹/ton)"))
+        last_date = pd.to_datetime(row.get("Last actual date"), errors="coerce")
+        ld = last_date.strftime("%d %b %Y") if pd.notna(last_date) else "-"
+        nextwk = row.get("Next-wk forecast")
+        p12 = row.get("+12wk forecast")
 
-        if row:
-            last_actual = row.get("Last actual (Rs./ton)", row.get("Last actual (₹/ton)"))
-            last_date = pd.to_datetime(row.get("Last actual date"), errors="coerce")
-            ld = last_date.strftime("%d %b %Y") if pd.notna(last_date) else "-"
-            nextwk = row.get("Next-wk forecast")
-            p12 = row.get("+12wk forecast")
-            top3 = row.get("Top-3 models (direction)", "")
+        nextwk_dir = dl.direction_flag(nextwk - last_actual) if (pd.notna(nextwk) and pd.notna(last_actual)) else row.get("Next-wk dir", "")
+        p12_dir = dl.direction_flag(p12 - last_actual) if (pd.notna(p12) and pd.notna(last_actual)) else row.get("+12wk dir", "")
 
-            k1, k2, k3 = st.columns(3)
-            k1.markdown(theme.kpi_card("Last actual spot", f"Rs.{last_actual:,.0f}", ld, theme.icon("rupee")), unsafe_allow_html=True)
-            k2.markdown(theme.kpi_card("Next-week forecast", f"Rs.{nextwk:,.0f}", theme.direction_chip(row.get("Next-wk dir", "")), theme.icon("clock")), unsafe_allow_html=True)
-            k3.markdown(theme.kpi_card("+12-week forecast", f"Rs.{p12:,.0f}", theme.direction_chip(row.get("+12wk dir", "")), theme.icon("trending")), unsafe_allow_html=True)
-            st.markdown(f"<div class='bm-footnote'>Model agreement (top-3 by direction): <b>{top3}</b></div>", unsafe_allow_html=True)
-        else:
-            last_actual, last_date = None, None
+        k1, k2, k3 = st.columns(3)
+        k1.markdown(theme.kpi_card("Last actual spot", f"Rs.{last_actual:,.0f}", ld, theme.icon("rupee")), unsafe_allow_html=True)
+        k2.markdown(theme.kpi_card("Next-week forecast", f"Rs.{nextwk:,.0f}", theme.direction_chip(nextwk_dir), theme.icon("clock")), unsafe_allow_html=True)
+        k3.markdown(theme.kpi_card("+12-week forecast", f"Rs.{p12:,.0f}", theme.direction_chip(p12_dir), theme.icon("trending")), unsafe_allow_html=True)
+    else:
+        last_actual, last_date = None, None
 
-        st.write("")
-        theme.section_title("Spot vs forecast (12-week ahead)", theme.icon("trending"))
-        acc_hist = dl.load_accuracy("16-week", meta["acc"])
-        forecast_chart(acc_hist, fwd)
-        st.markdown("<div class='bm-footnote'>Light blue = actual spot. Red dashed = model forecast "
-                    "(historical fit + 12-week ahead). Hover any point for its price.</div>",
-                    unsafe_allow_html=True)
+    st.write("")
+    theme.section_title("Spot vs forecast (12-week ahead)", theme.icon("trending"))
+    acc_hist = dl.load_accuracy("16-week", meta["acc"])
+    forecast_chart(acc_hist, fwd)
+    st.markdown("<div class='bm-footnote'>Light blue = actual spot. Red dashed = model forecast "
+                "(historical fit + 12-week ahead). Hover any point for its price.</div>",
+                unsafe_allow_html=True)
 
-        theme.section_title("12-week forecast path", theme.icon("calendar"))
-        rows_html = "".join(
-            f"<tr><td>W{int(r.Week)}</td><td>{r.Date:%d %b %Y}</td>"
-            f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
-            f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f}</td>"
-            f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>"
-            for r in fwd.itertuples()
-        )
-        st.markdown(
-            "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
-            "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-r'>&Delta; vs last actual</th>"
-            "<th class='bm-c'>Direction</th></tr></thead>"
-            f"<tbody>{rows_html}</tbody></table>",
-            unsafe_allow_html=True,
-        )
-        st.markdown("<div class='bm-footnote'>Headline line = Ensemble (Weighted Mean). "
-                    "See the <b>Calculators</b> tab for the Import vs Landed-Cost tool.</div>", unsafe_allow_html=True)
-
-    with tab_raw:
-        theme.section_title("Raw-material price forecast", theme.icon("trending"))
-        st.write("Raw-material forecasts are published on the BigMint subscriber platform. "
-                 "Products currently covered in the model include:")
-        summary = dl.load_summary()
-        raw = summary[~summary["Product"].astype(str).str.strip().isin(dl.STEEL_FF_LABELS)]
-        show_cols = [c for c in ["Product", "Last actual date", "Next-wk dir", "+12wk dir"] if c in raw.columns]
-        st.dataframe(raw[show_cols].reset_index(drop=True), use_container_width=True, hide_index=True)
-        st.write("")
-        st.markdown(f"<div class='bm-link-btn'><a href='{BIGMINT_URL}' target='_blank'>"
-                    "Open BigMint raw-material forecasts &nbsp;&rarr;</a></div>", unsafe_allow_html=True)
+    theme.section_title("12-week forecast path", theme.icon("calendar"))
+    rows_html = "".join(
+        f"<tr><td>W{int(r.Week)}</td><td>{r.Date:%d %b %Y}</td>"
+        f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
+        f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f}</td>"
+        f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>"
+        for r in fwd.itertuples()
+    )
+    st.markdown(
+        "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
+        "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-r'>&Delta; vs last actual</th>"
+        "<th class='bm-c'>Direction</th></tr></thead>"
+        f"<tbody>{rows_html}</tbody></table>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("<div class='bm-footnote'>Headline line = Ensemble (Weighted Mean). "
+                "See the <b>Calculators</b> tab for the Import vs Landed-Cost tool.</div>", unsafe_allow_html=True)
     theme.footer()
 
 
@@ -354,11 +381,12 @@ def page_analyst():
         with st.container(border=True):
             top = st.columns([5, 1])
             top[0].markdown(f"**{month} &mdash; {title}**", unsafe_allow_html=True)
-            top[1].markdown("<div style='text-align:right;color:#64748b;font-size:12px;'>PPT / PDF</div>", unsafe_allow_html=True)
+            top[1].markdown("<div style='text-align:right;color:#64748b;font-size:12px;'>PDF / PPT / Video</div>", unsafe_allow_html=True)
             st.write(summary)
-            b1, b2, _ = st.columns([1, 1, 4])
+            b1, b2, b3, _ = st.columns([1, 1, 1, 3])
             b1.button("Download PDF", key=f"pdf_{month}", disabled=True, icon=":material/picture_as_pdf:")
             b2.button("Download PPT", key=f"ppt_{month}", disabled=True, icon=":material/slideshow:")
+            b3.button("Download Video", key=f"vid_{month}", disabled=True, icon=":material/videocam:")
     if user["role"] == "Admin":
         st.caption("Admin: upload workflow for new calls will appear here in a later phase.")
     theme.footer()
@@ -369,30 +397,24 @@ def page_analyst():
 # ---------------------------------------------------------------------------
 def page_performance():
     st.markdown("## Performance dashboard")
-    c1, c2 = st.columns([3, 1])
-    with c1:
-        product = st.segmented_control("Product", list(dl.STEEL_PRODUCTS.keys()),
-                                       default="HRC", key="perf_prod", label_visibility="collapsed")
-    with c2:
-        window = st.segmented_control("Window", ["6-week", "16-week"], default="6-week",
-                                      key="perf_win", label_visibility="collapsed")
+    product = st.segmented_control("Product", list(dl.STEEL_PRODUCTS.keys()),
+                                   default="HRC", key="perf_prod", label_visibility="collapsed")
     product = product or "HRC"
-    window = window or "6-week"
     meta = dl.STEEL_PRODUCTS[product]
 
-    df = dl.load_accuracy(window, meta["acc"])
+    df = dl.load_accuracy("6-week", meta["acc"])   # Accuracy_Table_6 only (window toggle removed)
     if df.empty:
         st.warning("No accuracy data found for this product.")
         theme.footer()
         return
-    view = df.dropna(subset=["Actual", "Forecast"]).tail(16).reset_index(drop=True)
+    view = df.dropna(subset=["Actual", "Forecast"]).reset_index(drop=True)   # all rows from the sheet
     kpis = dl.accuracy_kpis(view)
 
     k1, k2, k3 = st.columns(3)
     k1.markdown(theme.kpi_card("Absolute accuracy (MAPA)",
                 f"{kpis['mapa']:.1f}%" if kpis['mapa'] is not None else "-", "100 - mean abs % error", theme.icon("target")), unsafe_allow_html=True)
     k2.markdown(theme.kpi_card("Directional accuracy",
-                f"{kpis['dir_acc']:.0f}%" if kpis['dir_acc'] is not None else "-", "correct up/down calls", theme.icon("gauge")), unsafe_allow_html=True)
+                f"{kpis['dir_acc']:.0f}%" if kpis['dir_acc'] is not None else "-", "correct up/down/flat calls", theme.icon("gauge")), unsafe_allow_html=True)
     k3.markdown(theme.kpi_card("Average delta",
                 f"{kpis['avg_delta']:+.1f}%" if kpis['avg_delta'] is not None else "-", "forecast vs spot", theme.icon("trending")), unsafe_allow_html=True)
 
@@ -401,6 +423,10 @@ def page_performance():
     perf_chart(view)
     theme.section_title("Weekly delta (forecast - spot)", theme.icon("insights") if False else theme.icon("gauge"))
     delta_bar(view)
+    theme.section_title("Weekly forecast accuracy (%)", theme.icon("target"))
+    accuracy_chart(view)
+    theme.section_title("Weekly directional accuracy", theme.icon("gauge"))
+    directional_accuracy_bar(view)
 
     theme.section_title("Week-wise detail", theme.icon("calendar"))
     rows_html = ""
@@ -409,17 +435,16 @@ def page_performance():
             f"<tr><td>W{i}</td><td>{r.Date:%d %b %Y}</td>"
             f"<td class='bm-r'>Rs.{r.Actual:,.0f}</td>"
             f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
-            f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f} ({r.DeltaPct:+.1f}%)</td>"
-            f"<td class='bm-c'>{theme.direction_chip(r.PredDir)}</td></tr>"
+            f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f} ({r.DeltaPct:+.1f}%)</td></tr>"
         )
     st.markdown(
         "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
         "<th class='bm-r'>Spot</th><th class='bm-r'>Forecast</th>"
-        "<th class='bm-r'>Delta</th><th class='bm-c'>Direction</th></tr></thead>"
+        "<th class='bm-r'>Delta</th></tr></thead>"
         f"<tbody>{rows_html}</tbody></table>",
         unsafe_allow_html=True,
     )
-    st.markdown("<div class='bm-footnote'>Delta = Forecast - Spot. Direction = model's predicted move vs the prior week's spot.</div>",
+    st.markdown("<div class='bm-footnote'>Delta = Forecast - Spot.</div>",
                 unsafe_allow_html=True)
     theme.footer()
 

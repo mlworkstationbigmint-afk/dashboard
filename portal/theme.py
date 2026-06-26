@@ -24,6 +24,7 @@ FORECAST_HALO = "rgba(225,43,32,0.16)"
 
 ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
 LOGO_PATH  = os.path.join(ASSETS_DIR, "bigmint_logo.png")
+ADANI_LOGO_PATH = os.path.join(ASSETS_DIR, "adani_logo.png")
 
 
 def _logo_html(height: int = 30) -> str:
@@ -34,7 +35,23 @@ def _logo_html(height: int = 30) -> str:
             return f"<img src='data:image/png;base64,{b64}' style='height:{height}px;display:block;'/>"
         except Exception:
             pass
-    return ("<span style='font-weight:800;font-size:22px;letter-spacing:.6px;color:#fff;'>BIGMINT</span>")
+    return ("<span style='font-weight:800;font-size:22px;letter-spacing:.6px;color:#fff;'>BigMint</span>")
+
+
+def _adani_logo_html(height: int = 26) -> str:
+    """Adani co-brand logo. Drop the official PNG at assets/adani_logo.png; otherwise
+    fall back to a gradient 'adani' wordmark approximation."""
+    if os.path.exists(ADANI_LOGO_PATH):
+        try:
+            with open(ADANI_LOGO_PATH, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode()
+            return f"<img src='data:image/png;base64,{b64}' style='height:{height}px;display:block;'/>"
+        except Exception:
+            pass
+    return ("<span style='font-weight:800;font-size:21px;letter-spacing:.2px;"
+            "background:linear-gradient(90deg,#1196C6,#6A4DA3,#C42A6B);"
+            "-webkit-background-clip:text;background-clip:text;"
+            "color:transparent;-webkit-text-fill-color:transparent;'>adani</span>")
 
 
 def inject_css():
@@ -52,7 +69,10 @@ section[data-testid="stSidebar"], div[data-testid="collapsedControl"] {{ display
     display: flex; align-items: center; justify-content: space-between;
     margin: 0 0 14px 0; box-shadow: 0 2px 10px rgba(2,76,161,.18);
 }}
-.bm-topbar-l {{ display:flex; align-items:center; gap:14px; }}
+.bm-topbar-l {{ display:flex; align-items:center; gap:13px; }}
+.bm-cobrand-x {{ color:#cfe0f5; font-size:17px; font-weight:600; }}
+.bm-adani-chip {{ background:#fff; border-radius:8px; padding:5px 11px; display:inline-flex;
+    align-items:center; box-shadow:0 1px 3px rgba(0,0,0,.14); }}
 .bm-portal-title {{ color:#fff; font-size:15px; font-weight:600; opacity:.96;
     border-left:1px solid rgba(255,255,255,.4); padding-left:14px; }}
 .bm-topbar-r {{ color:#cfe0f5; font-size:12.5px; text-align:right; line-height:1.4; }}
@@ -68,6 +88,34 @@ div[data-testid="stHorizontalBlock"] {{ align-items: stretch; }}
     border-color:{PRIMARY}; color:{PRIMARY}; background:{PRIMARY_SOFT};
 }}
 .stButton > button[kind="primary"] {{ box-shadow:0 2px 8px rgba(2,76,161,.25); }}
+
+/* ---------- home module card-buttons (whole card is one clickable button) ---------- */
+/* layout: icon on top -> **title** (strong) -> brief (p text) -> *Open ->* (em CTA) */
+div[class*="st-key-homemod_"] button {{
+    height:100%; min-height:196px; flex-direction:column;
+    align-items:flex-start; justify-content:flex-start; gap:0;
+    text-align:left; white-space:normal; padding:22px 22px 20px; border-radius:16px;
+    border:1px solid #e8edf3 !important; background:#fff !important;
+    box-shadow:0 1px 2px rgba(16,24,40,.05); font-weight:400;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}}
+div[class*="st-key-homemod_"] button:hover {{
+    border-color:{PRIMARY} !important; background:{PRIMARY_SOFT} !important;
+    transform:translateY(-3px); box-shadow:0 10px 26px rgba(2,76,161,.12);
+}}
+/* leading material icon -> larger, on its own row above the text */
+div[class*="st-key-homemod_"] button [data-testid="stIconMaterial"] {{
+    font-size:30px !important; width:30px; height:30px; color:{PRIMARY}; margin-bottom:14px;
+}}
+div[class*="st-key-homemod_"] button strong {{
+    display:block; font-size:18px; color:{PRIMARY_DARK}; font-weight:700; margin-bottom:6px;
+}}
+div[class*="st-key-homemod_"] button p {{ font-size:13.5px; color:{NEUTRAL}; line-height:1.5; margin:0; font-weight:400; }}
+/* "Open ->" call-to-action (rendered from the *Open ->* em in the label) */
+div[class*="st-key-homemod_"] button em {{
+    display:block; font-style:normal; font-weight:700; color:{ACCENT};
+    font-size:13px; letter-spacing:.3px; margin-top:14px;
+}}
 
 /* ---------- direction chips ---------- */
 .dir-chip {{ font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; white-space:nowrap; display:inline-block; }}
@@ -105,6 +153,14 @@ div[data-testid="stHorizontalBlock"] {{ align-items: stretch; }}
 /* tabs */
 button[data-baseweb="tab"] {{ font-size:15px; font-weight:600; }}
 div[data-baseweb="tab-list"] {{ gap:4px; border-bottom:1px solid #e2e8f0; }}
+/* tabs + segmented selectors -> BigMint orange accent (brand bar + buttons stay blue) */
+button[data-baseweb="tab"][aria-selected="true"] {{ color:{ACCENT} !important; }}
+div[data-baseweb="tab-highlight"] {{ background-color:{ACCENT} !important; }}
+button[data-testid="stBaseButton-segmented_controlActive"] {{
+    color:{ACCENT} !important; border-color:{ACCENT} !important;
+    background-color:rgba(238,78,36,0.10) !important;
+}}
+button[data-testid="stBaseButton-segmented_controlActive"] p {{ color:{ACCENT} !important; }}
 
 /* links / footer */
 .bm-link-btn a {{ display:inline-block; background:{ACCENT}; color:#fff!important; text-decoration:none;
@@ -146,6 +202,8 @@ def render_topbar(user: dict | None = None):
     st.markdown(
         f"<div class='bm-topbar'>"
         f"<div class='bm-topbar-l'>{_logo_html()}"
+        f"<span class='bm-cobrand-x'>&times;</span>"
+        f"<span class='bm-adani-chip'>{_adani_logo_html()}</span>"
         f"<span class='bm-portal-title'>AI Labs &mdash; Steel Price Forecasting Model</span></div>"
         f"<div class='bm-topbar-r'>{right}</div>"
         f"</div>",
@@ -195,7 +253,7 @@ def footer():
     st.markdown(
         "<div class='bm-footer'>"
         "<span>AI-generated forecasts are indicative. Prototype build &mdash; data shown is a static snapshot.</span>"
-        "<span>&copy; BigMint &middot; AI Labs &nbsp;|&nbsp; <a href='https://www.bigmint.co/' target='_blank'>bigmint.co</a></span>"
+        "<span>&copy; BigMint &times; Adani &middot; AI Labs &nbsp;|&nbsp; <a href='https://www.bigmint.co/' target='_blank'>bigmint.co</a></span>"
         "</div>",
         unsafe_allow_html=True,
     )

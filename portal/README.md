@@ -21,7 +21,7 @@ streamlit run portal/app.py
 
 ## Modules
 - **Home** - landing with module cards.
-- **Price forecasting** - (i) Steel: spot vs 12-week Ensemble (Wgt-Mean) forecast + direction for the six products; (ii) Raw-material: teaser + link to https://www.bigmint.co/.
+- **Price forecasting** - Steel: spot vs 12-week Ensemble (Wgt-Mean) forecast + direction for the six products.
 - **Analyst calls** - placeholder repository (summaries + PPT/PDF), to be wired later.
 - **Performance dashboard** - week-wise Spot / Forecast / Delta / Direction + MAPA & directional-accuracy KPIs (6 or 16-week window).
 - **Calculators** - Import Price (HRC), Production Cost & Margin, Price Elasticity (HRC).

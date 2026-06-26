@@ -32,8 +32,6 @@ STEEL_PRODUCTS = {
     "Rebar IF Raipur":       {"ff": "REBAR IF RAIPUR",     "acc": "REBAR IF RAIPUR"},
     "Structure (IF Raipur)": {"ff": "STRUCTURE IF RAIPUR", "acc": "STRUCTURE IF RAIPUR"},
 }
-# raw-material rows in the summary (everything that is not one of the six steel sheets)
-STEEL_FF_LABELS = {v["ff"] for v in STEEL_PRODUCTS.values()}
 
 
 def _num(s):
@@ -41,6 +39,20 @@ def _num(s):
         s.astype(str).str.replace(",", "", regex=False).str.replace("₹", "", regex=False).str.strip(),
         errors="coerce",
     )
+
+
+FLAT_THRESHOLD = 500.0   # Rs./ton dead-band: |change| <= 500 => Flat
+
+
+def direction_flag(delta, thr: float = FLAT_THRESHOLD) -> str:
+    """Up / Down / Flat from a numeric change, with a +/-thr dead-band mapping to Flat."""
+    if pd.isna(delta):
+        return "Flat"
+    if delta > thr:
+        return "Up"
+    if delta < -thr:
+        return "Down"
+    return "Flat"
 
 
 @st.cache_data(show_spinner=False)
@@ -63,7 +75,7 @@ def load_forward(ff_sheet: str) -> pd.DataFrame:
     data["Week"] = pd.to_numeric(data["Week"], errors="coerce").astype("Int64")
     data["Forecast"] = _num(data["Forecast"])
     data["Delta"] = _num(data["Delta"])
-    data["Direction"] = data["Direction"].astype(str).str.strip()
+    data["Direction"] = data["Delta"].map(direction_flag)   # +/-500 dead-band => Flat
     return data.dropna(subset=["Date", "Forecast"]).reset_index(drop=True)
 
 
@@ -91,9 +103,9 @@ def load_accuracy(window: str, acc_label: str) -> pd.DataFrame:
     df["Delta"] = df["Forecast"] - df["Actual"]
     df["DeltaPct"] = (df["Delta"] / df["Actual"]) * 100
     prev_actual = df["Actual"].shift(1)
-    df["PredDir"] = (df["Forecast"] > prev_actual).map({True: "Up", False: "Down"})
-    df["ActualDir"] = (df["Actual"] > prev_actual).map({True: "Up", False: "Down"})
-    df.loc[df.index[0], ["PredDir", "ActualDir"]] = "Flat"
+    df["PredDir"] = (df["Forecast"] - prev_actual).map(direction_flag)   # vs prior week's spot, +/-500 => Flat
+    df["ActualDir"] = (df["Actual"] - prev_actual).map(direction_flag)
+    df.loc[df.index[0], ["PredDir", "ActualDir"]] = "Flat"               # no prior reference
     df["Hit"] = df["PredDir"] == df["ActualDir"]
     return df
 

@@ -253,7 +253,7 @@ def footer():
     st.markdown(
         "<div class='bm-footer'>"
         "<span>AI-generated forecasts are indicative. Prototype build &mdash; data shown is a static snapshot.</span>"
-        "<span>&copy; BigMint | Adani &middot; AI Labs &nbsp;|&nbsp; <a href='https://www.bigmint.co/' target='_blank'>bigmint.co</a></span>"
+        "<span>&copy; BigMint - Adani &middot; AI Labs &nbsp;|&nbsp; <a href='https://www.bigmint.co/' target='_blank'>bigmint.co</a></span>"
         "</div>",
         unsafe_allow_html=True,
     )

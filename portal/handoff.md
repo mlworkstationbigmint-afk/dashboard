@@ -80,6 +80,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
+- **Home — Performance card description lengthened** — was a 2-line blurb ("Week-wise accuracy: spot, forecast, delta and direction.") which left its "Open →" CTA higher than the other three 3-line cards. Expanded to "Week-wise accuracy: spot vs forecast, weekly delta, MAPA and directional hit-rate." so it wraps to ~3 lines and the CTAs align across the row. → `app.py` `page_home()` `modules` list.
 - **Co-brand text removed; topbar separator `×` → `|`** — the "BigMint × Adani" co-brand string now appears **only in the topbar** (as the two logos). Topbar divider between BigMint logo and the Adani chip changed from `&times;` to a pipe `|` (`render_topbar()` in `theme.py`; `.bm-cobrand-x` styling unchanged — class name kept as the CSS hook). Removed the co-brand text from: browser tab `page_title` → "Steel Price Forecasting Model", login caption → "Steel Price Forecasting Model", Home header → "## Steel Price Forecasting Model" (all `app.py`). **Footer keeps the co-branding** but with a pipe separator → "© BigMint | Adani · AI Labs" (`theme.py` `footer()`). → `theme.py`, `app.py`.
 
 ### 2026-06-25

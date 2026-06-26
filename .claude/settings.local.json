@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python -m py_compile portal/app.py)",
+      "PowerShell(if \\($?\\) { \"OK - app.py compiles\" })",
+      "PowerShell(python -m py_compile portal/app.py portal/data_loader.py)",
+      "PowerShell(if \\($?\\) { \"OK - app.py + data_loader.py compile\" })",
+      "PowerShell(python -m py_compile portal/theme.py)",
+      "PowerShell(conda run -n neuralforecast python -c \"import streamlit; print\\('streamlit', streamlit.__version__\\)\")",
+      "PowerShell(if \\($?\\) { \"theme.py compiles\" })",
+      "PowerShell(conda run -n neuralforecast python -c \"import streamlit, os; print\\(os.path.join\\(os.path.dirname\\(streamlit.__file__\\),'static'\\)\\)\")",
+      "Bash(conda run -n neuralforecast python -c ' *)",
+      "Bash(conda run *)",
+      "PowerShell(python -m py_compile portal/app.py portal/theme.py)",
+      "PowerShell(if \\($?\\) { \"OK - app.py + theme.py compile\" })",
+      "PowerShell(if \\($?\\) { \"OK - both files compile\" })"
+    ]
+  }
+}

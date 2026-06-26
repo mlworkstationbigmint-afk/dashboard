@@ -293,7 +293,7 @@ def page_home():
     modules = [
         ("Price forecasting", "Spot vs 12-week Ensemble forecast for the six steel products.", "trending_up", "Price Forecasting"),
         ("Analyst calls", "Monthly market-outlook calls, key insights and downloadable decks.", "campaign", "Analyst Calls"),
-        ("Performance", "Week-wise accuracy: spot, forecast, delta and direction.", "insights", "Performance Dashboard"),
+        ("Performance", "Week-wise accuracy: spot vs forecast, weekly delta, MAPA and directional hit-rate.", "insights", "Performance Dashboard"),
         ("Calculators", "Import vs landed-cost, production cost & margin, and price-elasticity tools.", "calculate", "Calculators"),
     ]
     for col, (title, desc, mi, target) in zip(st.columns(4), modules):

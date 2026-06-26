@@ -240,7 +240,7 @@ button[data-testid="stBaseButton-segmented_controlActive"] p {{ color:{ACCENT} !
 .bm-stat-v {{ font-size:24px; font-weight:800; color:{PRIMARY_DARK}; line-height:1.1; }}
 .bm-stat-l {{ font-size:12.5px; color:{NEUTRAL}; margin-top:4px; }}
 /* horizontal process flow */
-.bm-flow {{ display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:8px 0; }}
+.bm-flow {{ display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:0 0 14px; }}
 .bm-flow-step {{ flex:1 1 0; min-width:150px; background:#fff; border:1px solid #e8edf3; border-radius:14px;
     padding:18px 16px 14px; position:relative; box-shadow:0 1px 2px rgba(16,24,40,.05);
     transition:transform .15s ease, box-shadow .15s ease; }}
@@ -263,7 +263,7 @@ button[data-testid="stBaseButton-segmented_controlActive"] p {{ color:{ACCENT} !
 .bm-factor h5 {{ margin:0 0 2px; font-size:13.5px; color:{PRIMARY_DARK}; font-weight:700; }}
 .bm-factor p {{ margin:0; font-size:12.5px; color:{NEUTRAL}; line-height:1.4; }}
 /* horizon cards */
-.bm-horizon-grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0; }}
+.bm-horizon-grid {{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:6px 0; }}
 .bm-horizon {{ background:#fff; border:1px solid #e8edf3; border-top:3px solid {ACCENT}; border-radius:14px;
     padding:16px 18px; box-shadow:0 1px 2px rgba(16,24,40,.05); }}
 .bm-horizon h5 {{ margin:0 0 4px; font-size:15px; color:{PRIMARY_DARK}; }}

@@ -597,13 +597,16 @@ def page_methodology():
         ("calendar", "12-week forecast",     "Forward price path with up / down / flat direction."),
         ("notes",    "Accuracy tracking",    "Every forecast back-checked against realised spot."),
     ]
-    flow = "<div class='bm-flow'>"
-    for i, (ic, title, desc) in enumerate(steps):
-        flow += (f"<div class='bm-flow-step'><div class='num'>{i+1}</div>"
-                 f"<div class='ic'>{theme.icon(ic, 24)}</div><h5>{title}</h5><p>{desc}</p></div>")
-        if i < len(steps) - 1:
-            flow += "<div class='bm-flow-arrow'>&rarr;</div>"
-    flow += "</div>"
+    flow = ""
+    for r0 in range(0, len(steps), 3):                 # 3 steps per row -> balanced 3 + 3
+        chunk = steps[r0:r0 + 3]
+        flow += "<div class='bm-flow'>"
+        for j, (ic, title, desc) in enumerate(chunk):
+            flow += (f"<div class='bm-flow-step'><div class='num'>{r0 + j + 1}</div>"
+                     f"<div class='ic'>{theme.icon(ic, 24)}</div><h5>{title}</h5><p>{desc}</p></div>")
+            if j < len(chunk) - 1:
+                flow += "<div class='bm-flow-arrow'>&rarr;</div>"
+        flow += "</div>"
     st.markdown(flow, unsafe_allow_html=True)
 
     st.write("")
@@ -625,17 +628,17 @@ def page_methodology():
 
     st.write("")
     theme.section_title("Forecast horizons", theme.icon("clock"))
-    st.markdown(
-        "<div class='bm-horizon-grid'>"
-        "<div class='bm-horizon'><span class='tag'>Short term</span>"
-        "<h5>Weekly &amp; monthly</h5><p>Near-term price moves, refreshed frequently.</p></div>"
-        "<div class='bm-horizon'><span class='tag'>Mid term</span>"
-        "<h5>Quarterly</h5><p>Updated monthly as fresh data arrives.</p></div>"
-        "<div class='bm-horizon'><span class='tag'>Long term</span>"
-        "<h5>Annual</h5><p>Updated quarterly for strategic planning.</p></div>"
-        "</div>",
-        unsafe_allow_html=True,
-    )
+    horizons = [
+        ("Weekly",      "Week-ahead", "Next-week price moves, updated every week."),
+        ("Short term",  "Monthly",    "Near-term month-ahead outlook."),
+        ("Medium term", "Quarterly",  "Quarterly view, refreshed monthly."),
+        ("Long term",   "Annual",     "Annual view, refreshed quarterly."),
+    ]
+    hz = "<div class='bm-horizon-grid'>" + "".join(
+        f"<div class='bm-horizon'><span class='tag'>{tag}</span><h5>{title}</h5><p>{desc}</p></div>"
+        for tag, title, desc in horizons
+    ) + "</div>"
+    st.markdown(hz, unsafe_allow_html=True)
     st.markdown("<div class='bm-footnote'>This Adani prototype surfaces the <b>12-week</b> horizon on the "
                 "headline Ensemble (Weighted Mean) line.</div>", unsafe_allow_html=True)
 

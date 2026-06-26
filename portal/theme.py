@@ -194,6 +194,54 @@ button[data-testid="stBaseButton-segmented_controlActive"] {{
 }}
 button[data-testid="stBaseButton-segmented_controlActive"] p {{ color:{ACCENT} !important; }}
 
+/* ---------- methodology infographics ---------- */
+.bm-meth-hero {{ background:linear-gradient(120deg,{PRIMARY} 0%,{PRIMARY_DARK} 100%); color:#fff;
+    border-radius:16px; padding:22px 26px; margin:2px 0 18px; box-shadow:0 6px 22px rgba(2,76,161,.20); }}
+.bm-meth-hero h3 {{ margin:0 0 6px; font-size:20px; color:#fff; }}
+.bm-meth-hero p {{ margin:0; font-size:14px; line-height:1.6; color:#dce8f8; max-width:860px; }}
+/* stat strip */
+.bm-stat-row {{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:0 0 20px; }}
+.bm-stat {{ background:#fff; border:1px solid #e8edf3; border-radius:14px; padding:16px 18px; text-align:center;
+    box-shadow:0 1px 2px rgba(16,24,40,.05); }}
+.bm-stat-v {{ font-size:24px; font-weight:800; color:{PRIMARY_DARK}; line-height:1.1; }}
+.bm-stat-l {{ font-size:12.5px; color:{NEUTRAL}; margin-top:4px; }}
+/* horizontal process flow */
+.bm-flow {{ display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:8px 0; }}
+.bm-flow-step {{ flex:1 1 0; min-width:150px; background:#fff; border:1px solid #e8edf3; border-radius:14px;
+    padding:18px 16px 14px; position:relative; box-shadow:0 1px 2px rgba(16,24,40,.05);
+    transition:transform .15s ease, box-shadow .15s ease; }}
+.bm-flow-step:hover {{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(2,76,161,.10); }}
+.bm-flow-step .num {{ position:absolute; top:-11px; left:16px; width:24px; height:24px; border-radius:50%;
+    background:{ACCENT}; color:#fff; font-size:12.5px; font-weight:700; display:flex; align-items:center;
+    justify-content:center; box-shadow:0 2px 6px rgba(238,78,36,.35); }}
+.bm-flow-step .ic {{ color:{PRIMARY}; margin:4px 0 8px; }}
+.bm-flow-step h5 {{ margin:0 0 4px; font-size:14px; color:{PRIMARY_DARK}; font-weight:700; }}
+.bm-flow-step p {{ margin:0; font-size:12.5px; color:{NEUTRAL}; line-height:1.45; }}
+.bm-flow-arrow {{ flex:0 0 26px; display:flex; align-items:center; justify-content:center; color:{ACCENT}; font-size:20px; }}
+/* factor grid */
+.bm-factor-grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0; }}
+.bm-factor {{ display:flex; gap:12px; align-items:flex-start; background:#fff; border:1px solid #e8edf3;
+    border-radius:14px; padding:14px 16px; box-shadow:0 1px 2px rgba(16,24,40,.05);
+    transition:transform .15s ease, box-shadow .15s ease; }}
+.bm-factor:hover {{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(2,76,161,.10); }}
+.bm-factor .ic {{ flex:0 0 38px; width:38px; height:38px; border-radius:10px; background:{PRIMARY_SOFT}; color:{PRIMARY};
+    display:flex; align-items:center; justify-content:center; }}
+.bm-factor h5 {{ margin:0 0 2px; font-size:13.5px; color:{PRIMARY_DARK}; font-weight:700; }}
+.bm-factor p {{ margin:0; font-size:12.5px; color:{NEUTRAL}; line-height:1.4; }}
+/* horizon cards */
+.bm-horizon-grid {{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0; }}
+.bm-horizon {{ background:#fff; border:1px solid #e8edf3; border-top:3px solid {ACCENT}; border-radius:14px;
+    padding:16px 18px; box-shadow:0 1px 2px rgba(16,24,40,.05); }}
+.bm-horizon h5 {{ margin:0 0 4px; font-size:15px; color:{PRIMARY_DARK}; }}
+.bm-horizon p {{ margin:0; font-size:12.5px; color:{NEUTRAL}; line-height:1.5; }}
+.bm-horizon .tag {{ display:inline-block; font-size:11px; font-weight:700; color:{ACCENT};
+    background:rgba(238,78,36,.10); border-radius:20px; padding:2px 10px; margin-bottom:8px; }}
+@media (max-width:760px) {{
+    .bm-stat-row, .bm-factor-grid, .bm-horizon-grid {{ grid-template-columns:1fr 1fr; }}
+    .bm-flow-arrow {{ display:none; }}
+    .bm-flow-step {{ flex:1 1 45%; }}
+}}
+
 /* links / footer */
 .bm-link-btn a {{ display:inline-block; background:{ACCENT}; color:#fff!important; text-decoration:none;
     padding:11px 20px; border-radius:9px; font-weight:600; font-size:14px; box-shadow:0 2px 8px rgba(238,78,36,.25); }}

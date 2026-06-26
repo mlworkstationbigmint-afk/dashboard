@@ -25,7 +25,9 @@
       "Bash(C:/Users/Pc/miniconda3/envs/neuralforecast/python.exe portal/_tmp_bartest.py)",
       "Bash(python -m py_compile portal/calculators/calc_import_price.py)",
       "Bash(C:/Users/Pc/miniconda3/envs/neuralforecast/python.exe portal/_tmp_bar2.py)",
-      "Bash(echo \"\\(temp removed\\)\")"
+      "Bash(echo \"\\(temp removed\\)\")",
+      "WebFetch(domain:www.bigmint.co)",
+      "WebSearch"
     ]
   }
 }

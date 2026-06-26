@@ -72,11 +72,12 @@ NAV = [
     ("Analyst Calls", "Analyst calls", "campaign"),
     ("Performance Dashboard", "Performance", "insights"),
     ("Calculators", "Calculators", "calculate"),
+    ("Methodology", "Methodology", "schema"),
 ]
 
 
 def top_nav():
-    cols = st.columns([1, 1.35, 1.35, 1.3, 1.3])
+    cols = st.columns([1, 1.35, 1.35, 1.3, 1.3, 1.4])
     for i, (name, label, mi) in enumerate(NAV):
         active = st.session_state.page == name
         if cols[i].button(f":material/{mi}: {label}", key=f"nav_{name}",
@@ -556,6 +557,104 @@ def page_calculators():
 
 
 # ---------------------------------------------------------------------------
+# PAGE: METHODOLOGY  (general, infographic-led)
+# ---------------------------------------------------------------------------
+def page_methodology():
+    st.markdown("## Methodology")
+
+    st.markdown(
+        "<div class='bm-meth-hero'>"
+        "<h3>How the forecast is built</h3>"
+        "<p>BigMint AI Labs forecasts steel prices with a <b>hybrid approach</b> &mdash; machine-learning "
+        "models trained on 15+ years of BigMint-assessed price data, combined with market sentiment. "
+        "Each forecast distils cost, supply&ndash;demand, global and macro signals into a single, transparent "
+        "price path with a documented rationale.</p></div>",
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        "<div class='bm-stat-row'>"
+        "<div class='bm-stat'><div class='bm-stat-v'>~98%</div><div class='bm-stat-l'>Price accuracy</div></div>"
+        "<div class='bm-stat'><div class='bm-stat-v'>15+ yrs</div><div class='bm-stat-l'>Historical data trained on</div></div>"
+        "<div class='bm-stat'><div class='bm-stat-v'>1&ndash;2%</div><div class='bm-stat-l'>Typical delta (error band)</div></div>"
+        "<div class='bm-stat'><div class='bm-stat-v'>IOSCO</div><div class='bm-stat-l'>Audited methodology</div></div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    theme.section_title("The forecasting pipeline", theme.icon("trending"))
+    steps = [
+        ("factory",  "Market data",          "Real-time trades, confirmed deals &amp; 15+ yrs of assessed prices."),
+        ("gauge",    "Signal engineering",   "Cost, supply&ndash;demand, global &amp; macro factors + sentiment."),
+        ("target",   "ML + sentiment",       "Multiple models predict each product; sentiment adjusts."),
+        ("trending", "Ensemble",             "Models blended into the headline Ensemble (Weighted Mean)."),
+        ("calendar", "12-week forecast",     "Forward price path with up / down / flat direction."),
+        ("notes",    "Accuracy tracking",    "Every forecast back-checked against realised spot."),
+    ]
+    flow = "<div class='bm-flow'>"
+    for i, (ic, title, desc) in enumerate(steps):
+        flow += (f"<div class='bm-flow-step'><div class='num'>{i+1}</div>"
+                 f"<div class='ic'>{theme.icon(ic, 24)}</div><h5>{title}</h5><p>{desc}</p></div>")
+        if i < len(steps) - 1:
+            flow += "<div class='bm-flow-arrow'>&rarr;</div>"
+    flow += "</div>"
+    st.markdown(flow, unsafe_allow_html=True)
+
+    st.write("")
+    theme.section_title("Key factors the model weighs", theme.icon("gauge"))
+    factors = [
+        ("rupee",    "Cost drivers",            "Raw-material &amp; conversion costs that set the price floor."),
+        ("trending", "Upstream &amp; downstream", "Linked prices along the steel value chain."),
+        ("home",     "Global prices",           "Import / export parity &amp; international benchmarks."),
+        ("gauge",    "Supply &amp; demand",      "Output, inventory and end-use demand balance."),
+        ("calendar", "Macro-economic",          "Rates, FX, growth and policy signals."),
+        ("mic",      "Market sentiment",        "Tone from deals, news and participant behaviour."),
+    ]
+    grid = "<div class='bm-factor-grid'>" + "".join(
+        f"<div class='bm-factor'><div class='ic'>{theme.icon(ic, 20)}</div>"
+        f"<div><h5>{title}</h5><p>{desc}</p></div></div>"
+        for ic, title, desc in factors
+    ) + "</div>"
+    st.markdown(grid, unsafe_allow_html=True)
+
+    st.write("")
+    theme.section_title("Forecast horizons", theme.icon("clock"))
+    st.markdown(
+        "<div class='bm-horizon-grid'>"
+        "<div class='bm-horizon'><span class='tag'>Short term</span>"
+        "<h5>Weekly &amp; monthly</h5><p>Near-term price moves, refreshed frequently.</p></div>"
+        "<div class='bm-horizon'><span class='tag'>Mid term</span>"
+        "<h5>Quarterly</h5><p>Updated monthly as fresh data arrives.</p></div>"
+        "<div class='bm-horizon'><span class='tag'>Long term</span>"
+        "<h5>Annual</h5><p>Updated quarterly for strategic planning.</p></div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    st.markdown("<div class='bm-footnote'>This Adani prototype surfaces the <b>12-week</b> horizon on the "
+                "headline Ensemble (Weighted Mean) line.</div>", unsafe_allow_html=True)
+
+    st.write("")
+    theme.section_title("Transparency &amp; governance", theme.icon("notes"))
+    tcol = st.columns(2)
+    tcol[0].markdown(
+        "<div class='bm-card'><h4>Explainable by design</h4>"
+        "<div class='bm-desc'>Every forecast ships with a <b>rationale</b> &mdash; a breakdown of the key "
+        "factors behind the move &mdash; so the logic behind each price shift is transparent, not a black box.</div></div>",
+        unsafe_allow_html=True)
+    tcol[1].markdown(
+        "<div class='bm-card'><h4>IOSCO-aligned</h4>"
+        "<div class='bm-desc'>Assessments follow BigMint's IOSCO-audited methodology &mdash; objective, "
+        "consistent across time and location, with noise and bias removed by an automated pricing system.</div></div>",
+        unsafe_allow_html=True)
+
+    st.write("")
+    st.info("Forecasts use selected factors based on data availability and do not account for unexpected "
+            "events, market disruptions or sentiment-driven shocks. Treat them as indicative, not guarantees.",
+            icon=":material/info:")
+    theme.footer()
+
+
+# ---------------------------------------------------------------------------
 # DISPATCH
 # ---------------------------------------------------------------------------
 PAGES = {
@@ -564,5 +663,6 @@ PAGES = {
     "Analyst Calls": page_analyst,
     "Performance Dashboard": page_performance,
     "Calculators": page_calculators,
+    "Methodology": page_methodology,
 }
 PAGES.get(st.session_state.page, page_home)()

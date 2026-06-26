@@ -51,6 +51,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 - **Analyst calls** — PLACEHOLDER cards: each has a headline summary + a one-line sectioned breakdown (Flats/Longs/Raw materials/Imports & exports/Outlook) + disabled PDF/PPT/Video buttons. All copy is placeholder.
 - **Performance dashboard** — product selector only (window toggle removed); reads **all rows** of `Accuracy_Table_6`. MAPA / directional / avg-delta KPIs, actual-vs-forecast chart + weekly-delta (Rs.) bars + **weekly accuracy % line** + **weekly directional-accuracy bars** + week-wise table.
 - **Calculators** — 3 tools in tabs.
+- **Methodology** — general (not per-product) infographic page: gradient hero + stat strip (~98% accuracy / 15+ yrs / 1–2% delta / IOSCO) + a 6-step **pipeline flow** (data → signals → ML+sentiment → ensemble → 12-wk forecast → accuracy) + 6 **key-factor** cards + 3 **horizon** cards + transparency/governance cards + disclaimer. Content sourced/generalised from bigmint.co forecasting methodology. All built with HTML/CSS (`.bm-meth-*`, `.bm-flow*`, `.bm-factor*`, `.bm-horizon*` in `theme.py`).
 
 ## "Edit X → go here"
 - Brand colours/logo → `theme.py` palette + `.streamlit/config.toml`; co-brand logos → `theme.py` `_logo_html` / `_adani_logo_html` + `render_topbar`

@@ -149,13 +149,29 @@ div[class*="st-key-homemod_"] button em {{
 .bm-table tbody tr:hover {{ background:#f7faff; }}
 .bm-r {{ text-align:right; font-variant-numeric:tabular-nums; }}
 .bm-c {{ text-align:center; }}
+/* larger table variant (used for the forecast-path table so it matches the chart's footprint) */
+.bm-table-lg {{ font-size:15px; box-shadow:0 1px 2px rgba(16,24,40,.05); }}
+.bm-table-lg thead th {{ padding:14px 18px; font-size:13px; letter-spacing:.3px; text-transform:uppercase; }}
+.bm-table-lg tbody td {{ padding:13px 18px; }}
 
-/* tabs */
-button[data-baseweb="tab"] {{ font-size:15px; font-weight:600; }}
-div[data-baseweb="tab-list"] {{ gap:4px; border-bottom:1px solid #e2e8f0; }}
-/* tabs + segmented selectors -> BigMint orange accent (brand bar + buttons stay blue) */
-button[data-baseweb="tab"][aria-selected="true"] {{ color:{ACCENT} !important; }}
-div[data-baseweb="tab-highlight"] {{ background-color:{ACCENT} !important; }}
+/* ---------- tabs -> modern segmented pills (orange active) ---------- */
+div[data-baseweb="tab-list"] {{
+    gap:6px; background:#e9edf4; padding:5px; border-radius:13px; margin-bottom:6px;
+    border-bottom:none !important; display:inline-flex; width:auto;
+    box-shadow:inset 0 1px 2px rgba(16,24,40,.06);
+}}
+button[data-baseweb="tab"] {{
+    font-size:14.5px; font-weight:600; color:{NEUTRAL}; background:transparent;
+    border:none !important; border-radius:9px; padding:9px 26px; margin:0; height:auto;
+    transition:color .15s ease, background .15s ease, box-shadow .15s ease;
+}}
+button[data-baseweb="tab"]:hover {{ color:{PRIMARY_DARK}; background:rgba(255,255,255,.55); }}
+button[data-baseweb="tab"][aria-selected="true"] {{
+    color:{ACCENT} !important; background:#fff !important; font-weight:700;
+    box-shadow:0 1px 4px rgba(16,24,40,.16);
+}}
+div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"] {{ display:none !important; }}
+/* segmented selectors (Product) -> orange active */
 button[data-testid="stBaseButton-segmented_controlActive"] {{
     color:{ACCENT} !important; border-color:{ACCENT} !important;
     background-color:rgba(238,78,36,0.10) !important;

@@ -99,8 +99,8 @@ st.write("")
 def _style_fig(fig, height=430, money=True):
     """Shared clean styling + a snap-to-point 'ball pointer' hover for all charts."""
     fig.update_layout(
-        height=height, margin=dict(l=8, r=8, t=30, b=8),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0,
+        height=height, margin=dict(l=14, r=22, t=38, b=14),
+        legend=dict(orientation="h", yanchor="bottom", y=1.03, x=0,
                     bgcolor="rgba(0,0,0,0)", font=dict(size=12.5)),
         plot_bgcolor="white", paper_bgcolor="rgba(0,0,0,0)",
         hovermode="closest", dragmode=False, hoverdistance=80,
@@ -109,7 +109,8 @@ def _style_fig(fig, height=430, money=True):
     if money:
         fig.update_yaxes(tickprefix="Rs.", tickformat=",.0f")
     fig.update_yaxes(gridcolor="#eef2f7", zeroline=False, showline=False, automargin=True)
-    fig.update_xaxes(gridcolor="rgba(0,0,0,0)", showline=True, linecolor="#e2e8f0")
+    fig.update_xaxes(gridcolor="rgba(0,0,0,0)", showline=True, linecolor="#e2e8f0",
+                     automargin=True, ticklabelstandoff=6)
     return fig
 
 
@@ -117,17 +118,21 @@ def _dt(t):
     return t.to_pydatetime() if hasattr(t, "to_pydatetime") else t
 
 
-def _spot_trace(dates, vals):
+def _spot_trace(dates, vals, fill=False):
     import plotly.graph_objects as go
+    extra = dict(fill="tozeroy", fillcolor="rgba(94,146,214,0.10)") if fill else {}
     return go.Scatter(
         x=[_dt(d) for d in dates], y=list(vals), name="Spot (actual)", mode="lines",
-        line=dict(color=theme.SPOT_LINE, width=2.4, shape="spline", smoothing=0.4),
+        line=dict(color=theme.SPOT_LINE, width=2.6, shape="spline", smoothing=0.4),
+        cliponaxis=False,
         hovertemplate="%{x|%d-%b-%y}<br><b>Spot Price: Rs.%{y:,.2f}</b><extra></extra>",
-        hoverlabel=dict(bgcolor="white", bordercolor="#cfe0f5", font=dict(color=theme.SPOT_DARK)))
+        hoverlabel=dict(bgcolor="white", bordercolor="#cfe0f5", font=dict(color=theme.SPOT_DARK)),
+        **extra)
 
 
 # custom Plotly.js layer: a halo+core "highlighter" ball that follows the hovered point
 _HL_TEMPLATE = """
+<style>html,body{margin:0;padding:0;overflow:hidden;background:transparent;}</style>
 <div id="__DIV__" style="width:100%;height:__H__px;"></div>
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 <script>
@@ -137,6 +142,9 @@ Plotly.newPlot(gd, fig.data, fig.layout, {displayModeBar:false, responsive:true}
 function hexA(c,a){ if(!c) return 'rgba(225,43,32,'+a+')'; if(c[0]!=='#') return c; var h=c.slice(1); if(h.length===3){h=h.split('').map(function(x){return x+x;}).join('');} var n=parseInt(h,16); return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')'; }
 gd.on('plotly_hover', function(d){ var p=d.points[0]; var col=(p.fullData.line&&p.fullData.line.color)||'#E12B20'; Plotly.restyle(gd, {x:[[p.x],[p.x]], y:[[p.y],[p.y]], 'marker.color':[hexA(col,0.20), col]}, [__HALO__,__CORE__]); });
 gd.on('plotly_unhover', function(){ Plotly.restyle(gd, {x:[[],[]], y:[[],[]]}, [__HALO__,__CORE__]); });
+// keep the plot fitted to its container (fixes edge-clipping on tab switch / window resize)
+if (window.ResizeObserver) { new ResizeObserver(function(){ Plotly.Plots.resize(gd); }).observe(gd); }
+window.addEventListener('resize', function(){ Plotly.Plots.resize(gd); });
 </script>
 """
 
@@ -146,9 +154,9 @@ def _render_with_highlighter(fig, height=430, dom_id="chart"):
     import plotly.graph_objects as go
     fig.update_layout(autosize=True)
     fig.add_trace(go.Scatter(x=[], y=[], mode="markers", hoverinfo="skip", showlegend=False,
-                             marker=dict(size=20, color="rgba(225,43,32,0.18)")))
+                             cliponaxis=False, marker=dict(size=22, color="rgba(225,43,32,0.18)")))
     fig.add_trace(go.Scatter(x=[], y=[], mode="markers", hoverinfo="skip", showlegend=False,
-                             marker=dict(size=9, color=theme.FORECAST_LINE, line=dict(width=2, color="#ffffff"))))
+                             cliponaxis=False, marker=dict(size=9, color=theme.FORECAST_LINE, line=dict(width=2, color="#ffffff"))))
     halo_idx, core_idx = len(fig.data) - 2, len(fig.data) - 1
     html = (_HL_TEMPLATE.replace("__DIV__", dom_id).replace("__H__", str(height))
             .replace("__FIGJSON__", fig.to_json())
@@ -157,7 +165,8 @@ def _render_with_highlighter(fig, height=430, dom_id="chart"):
 
 
 def forecast_chart(acc, fwd):
-    """Light-blue actual spot + bold red dashed model forecast (history fit + 12-week ahead)."""
+    """Light-blue actual spot (soft area fill) + bold red dashed forecast, with a dotted
+    divider and a faint shaded band marking the 12-week-ahead region."""
     hist = acc.dropna(subset=["Actual"]).tail(26).copy()
     if hist.empty:
         st.info("No historical spot series available for this product.")
@@ -167,14 +176,33 @@ def forecast_chart(acc, fwd):
         fc_dates = list(hist["Date"]) + list(fwd["Date"])
         fc_vals = list(hist["Forecast"]) + list(fwd["Forecast"])
         fig = go.Figure()
-        fig.add_trace(_spot_trace(hist["Date"], hist["Actual"]))
+        fig.add_trace(_spot_trace(hist["Date"], hist["Actual"], fill=True))
         fig.add_trace(go.Scatter(
             x=[_dt(d) for d in fc_dates], y=fc_vals, name="Forecast", mode="lines+markers",
             line=dict(color=theme.FORECAST_LINE, width=2.8, dash="dash", shape="spline", smoothing=0.4),
             marker=dict(size=5, color=theme.FORECAST_LINE, line=dict(width=4, color=theme.FORECAST_HALO)),
+            cliponaxis=False,
             hovertemplate="%{x|%d-%b-%y}<br><b>Forecast Price: Rs.%{y:,.2f}</b><extra></extra>",
             hoverlabel=dict(bgcolor="white", bordercolor="#f3c2bd", font=dict(color=theme.FORECAST_LINE))))
-        _render_with_highlighter(_style_fig(fig), height=430, dom_id="fc_chart")
+
+        # dotted divider + faint shaded band where the 12-week-ahead forecast begins
+        split_x = _dt(hist["Date"].iloc[-1])
+        if len(fwd):
+            fig.add_vrect(x0=split_x, x1=_dt(fwd["Date"].iloc[-1]),
+                          fillcolor="rgba(238,78,36,0.05)", line_width=0, layer="below")
+            fig.add_annotation(x=split_x, y=1, yref="paper", text="12-wk ahead",
+                               showarrow=False, xanchor="left", yanchor="top", xshift=6,
+                               font=dict(size=11, color=theme.ACCENT))
+        fig.add_vline(x=split_x, line=dict(color="#94a3b8", width=1.3, dash="dot"))
+
+        # pad the y-range so the area fill reads as a band rather than a block down to zero
+        yvals = [v for v in list(hist["Actual"]) + fc_vals if pd.notna(v)]
+        if yvals:
+            lo, hi = min(yvals), max(yvals)
+            pad = (hi - lo) * 0.14 or hi * 0.03
+            fig.update_yaxes(range=[lo - pad, hi + pad])
+
+        _render_with_highlighter(_style_fig(fig, height=500), height=500, dom_id="fc_chart")
     except Exception:
         h = hist.set_index("Date")[["Actual", "Forecast"]]
         f = fwd.set_index("Date")[["Forecast"]].rename(columns={"Forecast": "Forecast (12-wk)"})
@@ -375,7 +403,7 @@ def page_forecasting():
             for r in fwd.itertuples()
         )
         st.markdown(
-            "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
+            "<table class='bm-table bm-table-lg'><thead><tr><th>Week</th><th>Date</th>"
             "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-r'>&Delta; vs last actual</th>"
             "<th class='bm-c'>Direction</th></tr></thead>"
             f"<tbody>{rows_html}</tbody></table>",

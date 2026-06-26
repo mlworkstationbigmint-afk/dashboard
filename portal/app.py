@@ -510,15 +510,15 @@ def page_performance():
 
     theme.section_title("Week-wise detail", theme.icon("calendar"))
     rows_html = ""
-    for i, r in enumerate(view.itertuples(), start=1):
+    for r in view.itertuples():
         rows_html += (
-            f"<tr><td>W{i}</td><td>{r.Date:%d %b %Y}</td>"
+            f"<tr><td>{r.Date:%d %b %Y}</td>"
             f"<td class='bm-r'>Rs.{r.Actual:,.0f}</td>"
             f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
             f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f} ({r.DeltaPct:+.1f}%)</td></tr>"
         )
     st.markdown(
-        "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
+        "<table class='bm-table'><thead><tr><th>Date</th>"
         "<th class='bm-r'>Spot</th><th class='bm-r'>Forecast</th>"
         "<th class='bm-r'>Delta</th></tr></thead>"
         f"<tbody>{rows_html}</tbody></table>",

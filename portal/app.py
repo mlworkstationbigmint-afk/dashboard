@@ -457,12 +457,27 @@ def page_analyst():
         ("May 2026", "Market outlook call", "Rebar firm on monsoon-led restocking; scrap stable. Key insights and downloadable deck."),
         ("April 2026", "Market outlook call", "Q1 review and forward view across flats and longs."),
     ]
+    # detailed-summary sections (one line each). Placeholder copy for now — real per-call
+    # commentary to be supplied later.
+    CALL_SECTIONS = [
+        ("Flats", "HRC / CR / plate &mdash; placeholder one-line commentary."),
+        ("Longs", "Rebar / wire rod / structurals &mdash; placeholder one-line commentary."),
+        ("Raw materials", "Iron ore, coking coal &amp; scrap &mdash; placeholder one-line commentary."),
+        ("Imports &amp; exports", "Trade flows and landed-cost parity &mdash; placeholder one-line commentary."),
+        ("Outlook", "Near-term price direction &mdash; placeholder one-line commentary."),
+    ]
+    sections_html = "<div class='bm-call-secs'>" + "".join(
+        f"<div class='bm-call-sec'><span class='bm-call-sec-l'>{label}</span>"
+        f"<span class='bm-call-sec-t'>{text}</span></div>"
+        for label, text in CALL_SECTIONS
+    ) + "</div>"
     for month, title, summary in placeholders:
         with st.container(border=True):
             top = st.columns([5, 1])
             top[0].markdown(f"**{month} &mdash; {title}**", unsafe_allow_html=True)
             top[1].markdown("<div style='text-align:right;color:#64748b;font-size:12px;'>PDF / PPT / Video</div>", unsafe_allow_html=True)
-            st.write(summary)
+            st.markdown(f"<div class='bm-desc' style='font-size:13.5px;'>{summary}</div>", unsafe_allow_html=True)
+            st.markdown(sections_html, unsafe_allow_html=True)
             b1, b2, b3, _ = st.columns([1, 1, 1, 3])
             b1.button("Download PDF", key=f"pdf_{month}", disabled=True, icon=":material/picture_as_pdf:")
             b2.button("Download PPT", key=f"ppt_{month}", disabled=True, icon=":material/slideshow:")

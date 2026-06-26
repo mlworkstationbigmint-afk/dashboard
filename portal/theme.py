@@ -136,6 +136,13 @@ div[class*="st-key-homemod_"] button em {{
 .bm-card h4 {{ margin:2px 0 4px 0; color:{PRIMARY_DARK}; font-size:16px; }}
 .bm-card .bm-desc {{ color:{NEUTRAL}; font-size:13px; }}
 
+/* analyst-call detailed summary: label + one-line section rows */
+.bm-call-secs {{ margin:8px 0 2px 0; }}
+.bm-call-sec {{ display:flex; gap:12px; padding:7px 0; border-top:1px dashed #eef2f7; font-size:13.5px; line-height:1.45; }}
+.bm-call-sec:first-child {{ border-top:none; }}
+.bm-call-sec-l {{ flex:0 0 140px; font-weight:700; color:{PRIMARY_DARK}; }}
+.bm-call-sec-t {{ color:{NEUTRAL}; }}
+
 /* section heading */
 .bm-h {{ font-size:15px; font-weight:600; color:{PRIMARY_DARK}; margin:6px 0 6px 0;
     display:flex; align-items:center; gap:8px; }}

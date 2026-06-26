@@ -48,7 +48,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 ## Modules
 - **Home** — overview stats + module cards.
 - **Price forecasting** — Steel only: product selector + KPI strip, then a **Graphical view / Tabular view** tab pair (Graphical = spot-vs-forecast chart; Tabular = one continuous *Actual vs Forecast* table, history flowing into the 12-wk-ahead forecast), then a **Forecast rationale** section (placeholder, per-product via `RATIONALES`). (Raw-material tab removed earlier.)
-- **Analyst calls** — PLACEHOLDER cards (no real content yet).
+- **Analyst calls** — PLACEHOLDER cards: each has a headline summary + a one-line sectioned breakdown (Flats/Longs/Raw materials/Imports & exports/Outlook) + disabled PDF/PPT/Video buttons. All copy is placeholder.
 - **Performance dashboard** — product selector only (window toggle removed); reads **all rows** of `Accuracy_Table_6`. MAPA / directional / avg-delta KPIs, actual-vs-forecast chart + weekly-delta (Rs.) bars + **weekly accuracy % line** + **weekly directional-accuracy bars** + week-wise table.
 - **Calculators** — 3 tools in tabs.
 
@@ -61,7 +61,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 - Chart look / lines / hover ball → `app.py` `_style_fig`, `_spot_trace`, `forecast_chart`, `perf_chart`, `delta_bar`, `accuracy_chart`, `directional_accuracy_bar`, `_render_with_highlighter`; colours in `theme.py` (`SPOT_LINE`, `FORECAST_LINE`, `FORECAST_HALO`)
 - Products → `data_loader.py` `STEEL_PRODUCTS`
 - Users → `auth.py` `USERS` + `DEMO_CREDENTIALS`
-- Analyst content → `app.py` `page_analyst()` placeholders
+- Analyst content → `app.py` `page_analyst()` placeholders (headline `summary` per call + the `CALL_SECTIONS` one-line breakdown: Flats/Longs/Raw materials/Imports & exports/Outlook)
 - Forecast rationale text → `app.py` `RATIONALES` dict (add a key per product name; `_default` is the placeholder shown until then)
 - Forecasting Graphical/Tabular tabs → `app.py` `page_forecasting()` `st.tabs([...])` block
 - History window (chart + historical table, kept in sync) → `app.py` `HIST_WEEKS` constant (currently 26)
@@ -83,6 +83,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
+- **Analyst Calls — detailed sectioned summary** — each call card now shows, below the headline summary line, a labelled one-line breakdown: **Flats / Longs / Raw materials / Imports & exports / Outlook** (label column + one-line text, styled via `.bm-call-sec*` in `theme.py`). All are **placeholder** copy for now (real per-call commentary to be supplied) — defined in the `CALL_SECTIONS` list in `page_analyst()`; edit/extend that list to change sections. → `app.py` `page_analyst()` + `theme.py`.
 - **Performance week-wise table — Week column removed** — the "Week-wise detail" table dropped its leading `W1/W2/…` column; it now shows **Date | Spot | Forecast | Delta**. (The directional-accuracy KPI/chart are unaffected.) → `app.py` `page_performance()`.
 - **Tabs → animated sliding switch** — the Graphical/Tabular tabs keep the segmented-pill look but the white active pill now **slides** between options instead of snapping. Done by repurposing baseweb's `tab-highlight` (which it repositions inline per active tab) into a full-height white pill + an explicit `transition:left/width .28s` ease; removed the per-tab static white bg/shadow so the sliding pill is the only moving white element; tab buttons raised above it via `z-index`. → `theme.py` tab CSS. (Streamlit only swaps the *panel content* on rerun — that part can't carousel-slide; the **switch indicator** is what animates.)
 - **Forecasting Tabular view → one continuous Actual-vs-Forecast table** — single table with cols **Date | Actual | Forecast | Δ (Actual − Forecast) | Direction**, history flowing straight into the 12-week-ahead forecast:

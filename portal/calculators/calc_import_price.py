@@ -311,6 +311,32 @@ def render():
             unsafe_allow_html=True,
         )
 
+    st.markdown("##### Landed cost by country vs domestic benchmark")
+    try:
+        import plotly.graph_objects as go
+        ordered_chart = sorted(regions, key=lambda r: results[r]["landed"])
+        landed_vals = [results[r]["landed"] for r in ordered_chart]
+        bar_colors = ["#1F9D55" if results[r]["diff"] < 0 else "#D8382B" for r in ordered_chart]
+        fig = go.Figure(go.Bar(
+            x=ordered_chart, y=landed_vals, marker_color=bar_colors,
+            text=[f"Rs.{int(v):,}" for v in landed_vals], textposition="outside",
+            cliponaxis=False, hovertemplate="%{x}<br>Landed: Rs.%{y:,.0f}/t<extra></extra>",
+        ))
+        fig.add_hline(y=domestic, line=dict(color="#073A7D", width=2, dash="dot"),
+                      annotation_text=f"Domestic Rs.{int(domestic):,}/t", annotation_position="top left",
+                      annotation_font_color="#073A7D", annotation_font_size=12)
+        fig.update_layout(height=380, margin=dict(l=10, r=10, t=30, b=10),
+                          plot_bgcolor="white", paper_bgcolor="rgba(0,0,0,0)",
+                          font=dict(size=12, color="#334155"), bargap=0.4, showlegend=False)
+        fig.update_yaxes(title_text="Landed cost (Rs./t)", tickprefix="Rs.", tickformat=",.0f",
+                         gridcolor="#eef2f7", range=[0, max(max(landed_vals), domestic) * 1.12])
+        fig.update_xaxes(title_text="")
+        st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
+    except Exception:
+        st.bar_chart(pd.DataFrame({"Landed Rs./t": {r: results[r]["landed"] for r in regions}}))
+    st.caption("Bars = landed cost per source (green = cheaper than domestic, red = pricier than domestic). "
+               "Dotted line = domestic benchmark.")
+
     st.markdown("##### Exchange-rate sensitivity (landed Rs./t)")
     fx_rows = []
     for r in regions:

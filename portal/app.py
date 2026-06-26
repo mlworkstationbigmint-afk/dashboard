@@ -319,7 +319,7 @@ def page_home():
     s1.markdown(theme.kpi_card("Steel products", "6", "tracked weekly", theme.icon("factory")), unsafe_allow_html=True)
     s2.markdown(theme.kpi_card("Forecast horizon", "12 wk", "Ensemble Wgt-Mean", theme.icon("trending")), unsafe_allow_html=True)
     s3.markdown(theme.kpi_card("Avg absolute accuracy", f"{avg_mapa:.1f}%" if avg_mapa else "-", f"MAPA, {n_weeks}-wk avg", theme.icon("target")), unsafe_allow_html=True)
-    s4.markdown(theme.kpi_card("Last actual", last_update, "most recent assessment", theme.icon("calendar")), unsafe_allow_html=True)
+    s4.markdown(theme.kpi_card("Last updated on", last_update, "most recent assessment", theme.icon("calendar")), unsafe_allow_html=True)
 
     st.write("")
     theme.section_title("Modules", theme.icon("home"))

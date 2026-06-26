@@ -21,7 +21,9 @@
       "Read(//c/Users/Pc/miniconda3/envs/**)",
       "Bash(C:/Users/Pc/miniconda3/envs/neuralforecast/python.exe -c 'import plotly; print\\('\\\\''plotly'\\\\'', plotly.__version__\\); import plotly.graph_objects as go; f=go.Figure\\(\\); f.update_xaxes\\(automargin=True, ticklabelstandoff=6\\); print\\('\\\\''ticklabelstandoff OK'\\\\''\\)')",
       "Bash(python -m py_compile portal/app.py)",
-      "Bash(python -m py_compile portal/theme.py)"
+      "Bash(python -m py_compile portal/theme.py)",
+      "Bash(C:/Users/Pc/miniconda3/envs/neuralforecast/python.exe portal/_tmp_bartest.py)",
+      "Bash(python -m py_compile portal/calculators/calc_import_price.py)"
     ]
   }
 }

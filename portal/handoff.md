@@ -47,7 +47,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Modules
 - **Home** — overview stats + module cards.
-- **Price forecasting** — Steel only: product selector + KPI strip, then a **Graphical view / Tabular view** tab pair (spot-vs-forecast chart | 12-wk forecast-path table), then a **Forecast rationale** section (placeholder, per-product via `RATIONALES`). (Raw-material tab removed earlier.)
+- **Price forecasting** — Steel only: product selector + KPI strip, then a **Graphical view / Tabular view** tab pair (Graphical = spot-vs-forecast chart; Tabular = a *Historical actual-vs-forecast* table + the *12-wk forecast-path* table), then a **Forecast rationale** section (placeholder, per-product via `RATIONALES`). (Raw-material tab removed earlier.)
 - **Analyst calls** — PLACEHOLDER cards (no real content yet).
 - **Performance dashboard** — product selector only (window toggle removed); reads **all rows** of `Accuracy_Table_6`. MAPA / directional / avg-delta KPIs, actual-vs-forecast chart + weekly-delta (Rs.) bars + **weekly accuracy % line** + **weekly directional-accuracy bars** + week-wise table.
 - **Calculators** — 3 tools in tabs.
@@ -64,6 +64,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 - Analyst content → `app.py` `page_analyst()` placeholders
 - Forecast rationale text → `app.py` `RATIONALES` dict (add a key per product name; `_default` is the placeholder shown until then)
 - Forecasting Graphical/Tabular tabs → `app.py` `page_forecasting()` `st.tabs([...])` block
+- History window (chart + historical table, kept in sync) → `app.py` `HIST_WEEKS` constant (currently 26)
 - Data parsing → `data_loader.py`
 - Direction Up/Down/Flat + flat threshold (500) → `data_loader.py` `direction_flag()` / `FLAT_THRESHOLD`
 
@@ -82,6 +83,10 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
+- **Forecasting Tabular view → two sections (Historical + Forward)** — the single 12-wk forecast table was split/reworked:
+  - **Historical &mdash; actual vs forecast** (new): Date | Actual | Forecast | Δ (Actual − Forecast) | Direction, for the **same window as the chart** of `acc_hist` (`load_accuracy("16-week", …)`). Window length is the shared `HIST_WEEKS` constant (= 26) used by **both** `forecast_chart` and the table, so the table always mirrors the graph (verified: graph rows == table rows for all 6 products). Footnote shows `len(hist_t)` dynamically. Δ = `Actual − Forecast` (forecast error); Direction = `ActualDir` (±500 dead-band Up/Down/Flat).
+  - **12-week forecast path (ahead)**: Date | Forecast | Direction — **Week column removed** and the old **"Δ vs last actual" column removed** (no actuals exist for future weeks).
+  - `acc_hist` load hoisted above the tabs (was inside the Graphical tab) so both tabs share it. → `app.py` `page_forecasting()`.
 - **Forecasting chart + tabs restyle (modern look, bigger, no edge-clipping)** —
   - *Tabs → segmented pills*: `theme.py` tab CSS rewritten from underline-tabs to a **pill/segmented control** on a grey track (`div[data-baseweb="tab-list"]` = inline-flex rounded `#e9edf4` bg; active tab = white pill + orange text + shadow; `tab-highlight`/`tab-border` hidden). Applies to **all** `st.tabs` (forecasting + calculators).
   - *Chart bigger + same footprint as table*: `forecast_chart` height 430 → **500**; forecast-path table uses new **`.bm-table-lg`** variant (15px, padding 14/13px, uppercase header) so the two tabs feel equal-sized.

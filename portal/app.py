@@ -96,6 +96,9 @@ st.write("")
 # ---------------------------------------------------------------------------
 # CHART HELPERS
 # ---------------------------------------------------------------------------
+HIST_WEEKS = 26   # weeks of history shown in the forecast chart AND the historical table (kept in sync)
+
+
 def _style_fig(fig, height=430, money=True):
     """Shared clean styling + a snap-to-point 'ball pointer' hover for all charts."""
     fig.update_layout(
@@ -167,7 +170,7 @@ def _render_with_highlighter(fig, height=430, dom_id="chart"):
 def forecast_chart(acc, fwd):
     """Light-blue actual spot (soft area fill) + bold red dashed forecast, with a dotted
     divider and a faint shaded band marking the 12-week-ahead region."""
-    hist = acc.dropna(subset=["Actual"]).tail(26).copy()
+    hist = acc.dropna(subset=["Actual"]).tail(HIST_WEEKS).copy()
     if hist.empty:
         st.info("No historical spot series available for this product.")
         return
@@ -364,6 +367,7 @@ def page_forecasting():
     summary = dl.load_summary()
     row = dl.summary_row(summary, meta["ff"])
     fwd = dl.load_forward(meta["ff"])
+    acc_hist = dl.load_accuracy("16-week", meta["acc"])
 
     if row:
         last_actual = row.get("Last actual (Rs./ton)", row.get("Last actual (₹/ton)"))
@@ -387,25 +391,49 @@ def page_forecasting():
 
     with tab_graph:
         theme.section_title("Spot vs forecast (12-week ahead)", theme.icon("trending"))
-        acc_hist = dl.load_accuracy("16-week", meta["acc"])
         forecast_chart(acc_hist, fwd)
         st.markdown("<div class='bm-footnote'>Light blue = actual spot. Red dashed = model forecast "
                     "(historical fit + 12-week ahead). Hover any point for its price.</div>",
                     unsafe_allow_html=True)
 
     with tab_table:
-        theme.section_title("12-week forecast path", theme.icon("calendar"))
+        # Historical section: realised actual vs the model's forecast + their delta
+        theme.section_title("Historical &mdash; actual vs forecast", theme.icon("calendar"))
+        hist_t = acc_hist.dropna(subset=["Actual", "Forecast"]).tail(HIST_WEEKS)
+        if hist_t.empty:
+            st.info("No historical actual-vs-forecast data for this product.")
+        else:
+            hrows = "".join(
+                f"<tr><td>{r.Date:%d %b %Y}</td>"
+                f"<td class='bm-r'>Rs.{r.Actual:,.0f}</td>"
+                f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
+                f"<td class='bm-r'>{'+' if (r.Actual - r.Forecast) >= 0 else ''}{(r.Actual - r.Forecast):,.0f}</td>"
+                f"<td class='bm-c'>{theme.direction_chip(r.ActualDir)}</td></tr>"
+                for r in hist_t.itertuples()
+            )
+            st.markdown(
+                "<table class='bm-table bm-table-lg'><thead><tr><th>Date</th>"
+                "<th class='bm-r'>Actual (Rs./t)</th><th class='bm-r'>Forecast (Rs./t)</th>"
+                "<th class='bm-r'>&Delta; (Actual &minus; Forecast)</th><th class='bm-c'>Direction</th></tr></thead>"
+                f"<tbody>{hrows}</tbody></table>",
+                unsafe_allow_html=True,
+            )
+            st.markdown(f"<div class='bm-footnote'>Last {len(hist_t)} weeks of realised spot vs the model's forecast "
+                        "(same window as the chart); &Delta; = actual &minus; forecast (forecast error).</div>",
+                        unsafe_allow_html=True)
+
+        # Forward 12-week forecast (no actuals yet)
+        st.write("")
+        theme.section_title("12-week forecast path (ahead)", theme.icon("trending"))
         rows_html = "".join(
-            f"<tr><td>W{int(r.Week)}</td><td>{r.Date:%d %b %Y}</td>"
+            f"<tr><td>{r.Date:%d %b %Y}</td>"
             f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
-            f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f}</td>"
             f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>"
             for r in fwd.itertuples()
         )
         st.markdown(
-            "<table class='bm-table bm-table-lg'><thead><tr><th>Week</th><th>Date</th>"
-            "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-r'>&Delta; vs last actual</th>"
-            "<th class='bm-c'>Direction</th></tr></thead>"
+            "<table class='bm-table bm-table-lg'><thead><tr><th>Date</th>"
+            "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-c'>Direction</th></tr></thead>"
             f"<tbody>{rows_html}</tbody></table>",
             unsafe_allow_html=True,
         )

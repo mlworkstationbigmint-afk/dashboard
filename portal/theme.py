@@ -147,6 +147,9 @@ div[class*="st-key-homemod_"] button em {{
     padding:10px 12px; text-align:left; }}
 .bm-table tbody td {{ padding:9px 12px; border-top:1px solid #eef2f7; color:#334155; }}
 .bm-table tbody tr:hover {{ background:#f7faff; }}
+/* forecast (future) rows in the continuous forecasting table -> faint orange band (matches chart) */
+.bm-table tbody tr.bm-fc-row {{ background:rgba(238,78,36,0.05); }}
+.bm-table tbody tr.bm-fc-row:hover {{ background:rgba(238,78,36,0.10); }}
 .bm-r {{ text-align:right; font-variant-numeric:tabular-nums; }}
 .bm-c {{ text-align:center; }}
 /* larger table variant (used for the forecast-path table so it matches the chart's footprint) */

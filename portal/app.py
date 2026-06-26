@@ -397,48 +397,40 @@ def page_forecasting():
                     unsafe_allow_html=True)
 
     with tab_table:
-        # Historical section: realised actual vs the model's forecast + their delta
-        theme.section_title("Historical &mdash; actual vs forecast", theme.icon("calendar"))
-        hist_t = acc_hist.dropna(subset=["Actual", "Forecast"]).tail(HIST_WEEKS)
-        if hist_t.empty:
-            st.info("No historical actual-vs-forecast data for this product.")
-        else:
-            hrows = "".join(
-                f"<tr><td>{r.Date:%d %b %Y}</td>"
-                f"<td class='bm-r'>Rs.{r.Actual:,.0f}</td>"
-                f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
-                f"<td class='bm-r'>{'+' if (r.Actual - r.Forecast) >= 0 else ''}{(r.Actual - r.Forecast):,.0f}</td>"
-                f"<td class='bm-c'>{theme.direction_chip(r.ActualDir)}</td></tr>"
-                for r in hist_t.itertuples()
-            )
-            st.markdown(
-                "<table class='bm-table bm-table-lg'><thead><tr><th>Date</th>"
-                "<th class='bm-r'>Actual (Rs./t)</th><th class='bm-r'>Forecast (Rs./t)</th>"
-                "<th class='bm-r'>&Delta; (Actual &minus; Forecast)</th><th class='bm-c'>Direction</th></tr></thead>"
-                f"<tbody>{hrows}</tbody></table>",
-                unsafe_allow_html=True,
-            )
-            st.markdown(f"<div class='bm-footnote'>Last {len(hist_t)} weeks of realised spot vs the model's forecast "
-                        "(same window as the chart); &Delta; = actual &minus; forecast (forecast error).</div>",
-                        unsafe_allow_html=True)
-
-        # Forward 12-week forecast (no actuals yet)
-        st.write("")
-        theme.section_title("12-week forecast path (ahead)", theme.icon("trending"))
-        rows_html = "".join(
-            f"<tr><td>{r.Date:%d %b %Y}</td>"
-            f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
-            f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>"
-            for r in fwd.itertuples()
-        )
+        # One continuous table: history (actual+forecast+delta, blank direction) flows into
+        # the 12-week-ahead forecast (forecast+direction, blank actual+delta).
+        theme.section_title("Actual vs forecast (history &rarr; 12-week ahead)", theme.icon("calendar"))
+        hist_t = acc_hist.dropna(subset=["Actual"]).tail(HIST_WEEKS)
+        body = ""
+        for r in hist_t.itertuples():
+            fc = f"Rs.{r.Forecast:,.0f}" if pd.notna(r.Forecast) else ""
+            if pd.notna(r.Forecast):
+                d = r.Actual - r.Forecast
+                delta = f"{'+' if d >= 0 else ''}{d:,.0f}"
+            else:
+                delta = ""
+            body += (f"<tr><td>{r.Date:%d %b %Y}</td>"
+                     f"<td class='bm-r'>Rs.{r.Actual:,.0f}</td>"
+                     f"<td class='bm-r'>{fc}</td>"
+                     f"<td class='bm-r'>{delta}</td>"
+                     f"<td class='bm-c'></td></tr>")
+        for r in fwd.itertuples():
+            body += (f"<tr class='bm-fc-row'><td>{r.Date:%d %b %Y}</td>"
+                     f"<td class='bm-r'></td>"
+                     f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
+                     f"<td class='bm-r'></td>"
+                     f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>")
         st.markdown(
             "<table class='bm-table bm-table-lg'><thead><tr><th>Date</th>"
-            "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-c'>Direction</th></tr></thead>"
-            f"<tbody>{rows_html}</tbody></table>",
+            "<th class='bm-r'>Actual (Rs./t)</th><th class='bm-r'>Forecast (Rs./t)</th>"
+            "<th class='bm-r'>&Delta; (Actual &minus; Forecast)</th><th class='bm-c'>Direction</th></tr></thead>"
+            f"<tbody>{body}</tbody></table>",
             unsafe_allow_html=True,
         )
-        st.markdown("<div class='bm-footnote'>Headline line = Ensemble (Weighted Mean). "
-                    "See the <b>Calculators</b> tab for the Import vs Landed-Cost tool.</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='bm-footnote'>Top {len(hist_t)} rows = realised spot vs forecast "
+                    "(same window as the chart); shaded rows = 12-week-ahead forecast (no actuals yet). "
+                    "&Delta; = actual &minus; forecast. Headline line = Ensemble (Weighted Mean).</div>",
+                    unsafe_allow_html=True)
 
     # ---- Forecast rationale (placeholder; real analyst commentary supplied later) ----
     st.write("")

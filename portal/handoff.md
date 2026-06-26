@@ -47,7 +47,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Modules
 - **Home** — overview stats + module cards.
-- **Price forecasting** — Steel only: product selector + KPI strip, then a **Graphical view / Tabular view** tab pair (Graphical = spot-vs-forecast chart; Tabular = a *Historical actual-vs-forecast* table + the *12-wk forecast-path* table), then a **Forecast rationale** section (placeholder, per-product via `RATIONALES`). (Raw-material tab removed earlier.)
+- **Price forecasting** — Steel only: product selector + KPI strip, then a **Graphical view / Tabular view** tab pair (Graphical = spot-vs-forecast chart; Tabular = one continuous *Actual vs Forecast* table, history flowing into the 12-wk-ahead forecast), then a **Forecast rationale** section (placeholder, per-product via `RATIONALES`). (Raw-material tab removed earlier.)
 - **Analyst calls** — PLACEHOLDER cards (no real content yet).
 - **Performance dashboard** — product selector only (window toggle removed); reads **all rows** of `Accuracy_Table_6`. MAPA / directional / avg-delta KPIs, actual-vs-forecast chart + weekly-delta (Rs.) bars + **weekly accuracy % line** + **weekly directional-accuracy bars** + week-wise table.
 - **Calculators** — 3 tools in tabs.
@@ -83,10 +83,10 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
-- **Forecasting Tabular view → two sections (Historical + Forward)** — the single 12-wk forecast table was split/reworked:
-  - **Historical &mdash; actual vs forecast** (new): Date | Actual | Forecast | Δ (Actual − Forecast) | Direction, for the **same window as the chart** of `acc_hist` (`load_accuracy("16-week", …)`). Window length is the shared `HIST_WEEKS` constant (= 26) used by **both** `forecast_chart` and the table, so the table always mirrors the graph (verified: graph rows == table rows for all 6 products). Footnote shows `len(hist_t)` dynamically. Δ = `Actual − Forecast` (forecast error); Direction = `ActualDir` (±500 dead-band Up/Down/Flat).
-  - **12-week forecast path (ahead)**: Date | Forecast | Direction — **Week column removed** and the old **"Δ vs last actual" column removed** (no actuals exist for future weeks).
-  - `acc_hist` load hoisted above the tabs (was inside the Graphical tab) so both tabs share it. → `app.py` `page_forecasting()`.
+- **Forecasting Tabular view → one continuous Actual-vs-Forecast table** — single table with cols **Date | Actual | Forecast | Δ (Actual − Forecast) | Direction**, history flowing straight into the 12-week-ahead forecast:
+  - **History rows** (top): Actual + Forecast + Δ filled; **Direction left blank**. Window = shared `HIST_WEEKS` constant (= 26), the *same window as the chart* — `forecast_chart` and the table both `tail(HIST_WEEKS)` so the table mirrors the graph (verified: equal row counts for all 6 products). `acc_hist = load_accuracy("16-week", …)`, filtered `dropna(["Actual"])` to match the chart exactly.
+  - **Forecast rows** (bottom, from `fwd`): **Actual + Δ blank**, Forecast + Direction filled; tinted with `.bm-fc-row` (faint orange band, mirrors the chart's shaded forecast region). **Week column** and the old **"Δ vs last actual" column** are gone.
+  - `acc_hist` load hoisted above the tabs (was inside the Graphical tab) so both tabs share it. Footnote notes the top-N history window + that shaded rows are the forecast. → `app.py` `page_forecasting()`, `theme.py` (`.bm-fc-row`).
 - **Forecasting chart + tabs restyle (modern look, bigger, no edge-clipping)** —
   - *Tabs → segmented pills*: `theme.py` tab CSS rewritten from underline-tabs to a **pill/segmented control** on a grey track (`div[data-baseweb="tab-list"]` = inline-flex rounded `#e9edf4` bg; active tab = white pill + orange text + shadow; `tab-highlight`/`tab-border` hidden). Applies to **all** `st.tabs` (forecasting + calculators).
   - *Chart bigger + same footprint as table*: `forecast_chart` height 430 → **500**; forecast-path table uses new **`.bm-table-lg`** variant (15px, padding 14/13px, uppercase header) so the two tabs feel equal-sized.

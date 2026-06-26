@@ -44,10 +44,6 @@ def login_screen():
                     st.rerun()
                 else:
                     st.error("Invalid username or password.")
-            with st.expander("Demo credentials"):
-                st.caption("Per-user demo access for this prototype:")
-                for un, pw in auth.DEMO_CREDENTIALS:
-                    st.write(f"`{un}`  /  `{pw}`")
     theme.footer()
     st.stop()
 

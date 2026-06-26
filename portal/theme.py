@@ -202,7 +202,7 @@ def render_topbar(user: dict | None = None):
     st.markdown(
         f"<div class='bm-topbar'>"
         f"<div class='bm-topbar-l'>{_logo_html()}"
-        f"<span class='bm-cobrand-x'>&times;</span>"
+        f"<span class='bm-cobrand-x'>|</span>"
         f"<span class='bm-adani-chip'>{_adani_logo_html()}</span>"
         f"<span class='bm-portal-title'>AI Labs &mdash; Steel Price Forecasting Model</span></div>"
         f"<div class='bm-topbar-r'>{right}</div>"
@@ -253,7 +253,7 @@ def footer():
     st.markdown(
         "<div class='bm-footer'>"
         "<span>AI-generated forecasts are indicative. Prototype build &mdash; data shown is a static snapshot.</span>"
-        "<span>&copy; BigMint &times; Adani &middot; AI Labs &nbsp;|&nbsp; <a href='https://www.bigmint.co/' target='_blank'>bigmint.co</a></span>"
+        "<span>&copy; BigMint | Adani &middot; AI Labs &nbsp;|&nbsp; <a href='https://www.bigmint.co/' target='_blank'>bigmint.co</a></span>"
         "</div>",
         unsafe_allow_html=True,
     )

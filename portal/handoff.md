@@ -23,7 +23,7 @@ Env = conda **`neuralforecast`**. Needs: streamlit, plotly, fpdf2, scikit-learn,
 ## Locked decisions
 - Streamlit UI-only prototype; per-user login; **12-week** horizon.
 - Headline forecast line = **Ensemble (Weighted Mean)**.
-- Title: "BigMint × Adani — Steel Price Forecasting Model" (co-branded; both logos in topbar). Brand name is **BigMint** (never "Bigmint").
+- Title: "Steel Price Forecasting Model". Co-branding lives **only in the topbar** as logos (BigMint logo `|` Adani chip — separator is a pipe, not `×`); the "BigMint × Adani" text was removed everywhere else. Brand name is **BigMint** (never "Bigmint").
 - Static snapshot data (no live connection).
 
 ## Six steel products (fixed)
@@ -79,6 +79,9 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 - **Accent split**: `primaryColor` (#024CA1, config.toml) drives the brand bar + buttons (blue), but the **active tab + active segmented selector** are force-overridden to `ACCENT` orange via `!important` CSS in `theme.py`. If they look wrong after a Streamlit upgrade, re-check the `stBaseButton-segmented_controlActive` / `tab-highlight` selectors.
 
 ## Changelog (prototype iterations)
+### 2026-06-26
+- **Co-brand text removed; topbar separator `×` → `|`** — the "BigMint × Adani" co-brand string now appears **only in the topbar** (as the two logos). Topbar divider between BigMint logo and the Adani chip changed from `&times;` to a pipe `|` (`render_topbar()` in `theme.py`; `.bm-cobrand-x` styling unchanged — class name kept as the CSS hook). Removed the co-brand text from: browser tab `page_title` → "Steel Price Forecasting Model", login caption → "Steel Price Forecasting Model", Home header → "## Steel Price Forecasting Model" (all `app.py`). **Footer keeps the co-branding** but with a pipe separator → "© BigMint | Adani · AI Labs" (`theme.py` `footer()`). → `theme.py`, `app.py`.
+
 ### 2026-06-25
 - **Analyst Calls** — added a third **Download Video** button (`:material/videocam:`) per call card beside PDF/PPT; row layout now `st.columns([1,1,1,3])`, corner label "PDF / PPT / Video". All three remain **disabled placeholders** (no real files wired yet). → `app.py` `page_analyst()`.
 - **Performance dashboard** — added two full-width charts below the Rs. delta bar (both read the same `view` frame; wired in `page_performance()` after `delta_bar`):

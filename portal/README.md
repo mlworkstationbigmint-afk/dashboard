@@ -1,4 +1,4 @@
-# BigMint - AI Labs : Steel Price Forecasting Model (Adani portal prototype)
+# BigMint - AI Labs : Price Forecasting: Steel (Adani portal prototype)
 
 Standalone Streamlit UI prototype. Data is a static, cached snapshot of the
 dashboard's existing forecast/accuracy files - no live connection.

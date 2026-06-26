@@ -316,26 +316,37 @@ def render():
         import plotly.graph_objects as go
         ordered_chart = sorted(regions, key=lambda r: results[r]["landed"])
         landed_vals = [results[r]["landed"] for r in ordered_chart]
-        bar_colors = ["#1F9D55" if results[r]["diff"] < 0 else "#D8382B" for r in ordered_chart]
+        diffs = [results[r]["diff"] for r in ordered_chart]   # landed - domestic (cheap < 0 < pricey)
         fig = go.Figure(go.Bar(
-            x=ordered_chart, y=landed_vals, marker_color=bar_colors,
+            x=ordered_chart, y=landed_vals,
+            marker=dict(
+                color=diffs, cmid=0,                          # diverging: green (cheap) -> amber -> red (pricey)
+                colorscale=[[0.0, "#15A34A"], [0.5, "#FBBF24"], [1.0, "#E11D48"]],
+                line=dict(color="white", width=1.5), cornerradius=9,
+            ),
             text=[f"Rs.{int(v):,}" for v in landed_vals], textposition="outside",
-            cliponaxis=False, hovertemplate="%{x}<br>Landed: Rs.%{y:,.0f}/t<extra></extra>",
+            textfont=dict(size=12, color="#0f172a"),
+            cliponaxis=False, hovertemplate="<b>%{x}</b><br>Landed: Rs.%{y:,.0f}/t<extra></extra>",
         ))
-        fig.add_hline(y=domestic, line=dict(color="#073A7D", width=2, dash="dot"),
-                      annotation_text=f"Domestic Rs.{int(domestic):,}/t", annotation_position="top left",
-                      annotation_font_color="#073A7D", annotation_font_size=12)
-        fig.update_layout(height=380, margin=dict(l=10, r=10, t=30, b=10),
+        fig.add_hline(
+            y=domestic, line=dict(color="#024CA1", width=2, dash="dash"),
+            annotation_text=f"  Domestic Rs.{int(domestic):,}/t  ", annotation_position="top left",
+            annotation_font=dict(color="white", size=12),
+            annotation_bgcolor="#024CA1", annotation_bordercolor="#024CA1", annotation_borderpad=4,
+        )
+        fig.update_layout(height=400, margin=dict(l=10, r=10, t=34, b=10),
                           plot_bgcolor="white", paper_bgcolor="rgba(0,0,0,0)",
-                          font=dict(size=12, color="#334155"), bargap=0.4, showlegend=False)
+                          font=dict(family="sans-serif", size=12, color="#334155"),
+                          bargap=0.45, showlegend=False)
         fig.update_yaxes(title_text="Landed cost (Rs./t)", tickprefix="Rs.", tickformat=",.0f",
-                         gridcolor="#eef2f7", range=[0, max(max(landed_vals), domestic) * 1.12])
-        fig.update_xaxes(title_text="")
+                         gridcolor="#f1f5f9", zeroline=False,
+                         range=[0, max(max(landed_vals), domestic) * 1.13])
+        fig.update_xaxes(title_text="", tickfont=dict(size=12.5, color="#0f172a"))
         st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
     except Exception:
         st.bar_chart(pd.DataFrame({"Landed Rs./t": {r: results[r]["landed"] for r in regions}}))
-    st.caption("Bars = landed cost per source (green = cheaper than domestic, red = pricier than domestic). "
-               "Dotted line = domestic benchmark.")
+    st.caption("Sorted cheapest → priciest. Colour shows distance from domestic parity "
+               "(green = cheaper, amber ≈ parity, red = pricier). Dashed line = domestic benchmark.")
 
     st.markdown("##### Exchange-rate sensitivity (landed Rs./t)")
     fx_rows = []

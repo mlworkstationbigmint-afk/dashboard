@@ -237,7 +237,7 @@ def render_topbar(user: dict | None = None):
         f"<div class='bm-topbar-l'>{_logo_html()}"
         f"<span class='bm-cobrand-x'>|</span>"
         f"<span class='bm-adani-chip'>{_adani_logo_html()}</span>"
-        f"<span class='bm-portal-title'>AI Labs &mdash; Steel Price Forecasting Model</span></div>"
+        f"<span class='bm-portal-title'>AI Labs &mdash; Price Forecasting: Steel</span></div>"
         f"<div class='bm-topbar-r'>{right}</div>"
         f"</div>",
         unsafe_allow_html=True,

@@ -1,4 +1,4 @@
-# BigMint – AI Labs Steel Price Forecasting Model — Handoff
+# BigMint – AI Labs Price Forecasting: Steel — Handoff
 
 Standalone **Streamlit UI prototype** for Adani. Data is a static, cached snapshot of the
 dashboard's existing forecast/accuracy files — no live backend.
@@ -23,7 +23,7 @@ Env = conda **`neuralforecast`**. Needs: streamlit, plotly, fpdf2, scikit-learn,
 ## Locked decisions
 - Streamlit UI-only prototype; per-user login; **12-week** horizon.
 - Headline forecast line = **Ensemble (Weighted Mean)**.
-- Title: "Steel Price Forecasting Model". Co-branding lives **only in the topbar** as logos (BigMint logo `|` Adani chip — separator is a pipe, not `×`); the "BigMint × Adani" text was removed everywhere else. Brand name is **BigMint** (never "Bigmint").
+- Title: "Price Forecasting: Steel". Co-branding lives **only in the topbar** as logos (BigMint logo `|` Adani chip — separator is a pipe, not `×`); the "BigMint × Adani" text was removed everywhere else. Brand name is **BigMint** (never "Bigmint").
 - Static snapshot data (no live connection).
 
 ## Six steel products (fixed)
@@ -83,9 +83,10 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
+- **Branding renamed → "Price Forecasting: Steel"** — product title changed from "Steel Price Forecasting Model" everywhere it's shown: browser tab `page_title`, login caption, Home header (`app.py`), and the topbar portal title "AI Labs — Price Forecasting: Steel" (`theme.py`). Also updated the `app.py` docstring, `README.md` and this handoff's title/locked-decision line. (Earlier same-day entries still reference the old name as historical record.)
 - **Login — Demo credentials section removed** — dropped the "Demo credentials" expander (username/password list) from `login_screen()`. `auth.DEMO_CREDENTIALS` is now unused by the app but **left defined in `auth.py`** (documents the demo logins; re-add the expander to surface it again). → `app.py` `login_screen()`.
 - **Home KPI relabel** — the 4th overview KPI label "Last actual" → **"Last updated on"** (value/sublabel unchanged: most-recent assessment date). → `app.py` `page_home()`.
-- **Import calculator — landed-cost bar chart** — added a Plotly bar chart (x = country/source, y = landed cost Rs./t) below the "lowest cost source" banner in `calc_import_price.py` `render()`. Bars sorted cheapest→priciest, coloured **green if viable** (landed < domestic) else **red**; a **dotted horizontal line** marks the domestic benchmark (`add_hline`, annotated "Domestic Rs.X/t"). Plain `st.plotly_chart` (no highlighter layer); `st.bar_chart` fallback in a try/except. → `calculators/calc_import_price.py`.
+- **Import calculator — landed-cost bar chart (modern restyle)** — added a Plotly bar chart (x = country/source, y = landed cost Rs./t) below the "lowest cost source" banner in `calc_import_price.py` `render()`. Bars sorted cheapest→priciest with **rounded corners** (`marker.cornerradius`), white borders, bold value labels, and a **diverging colour scale by `diff`** (green = cheaper than domestic → amber ≈ parity → red = pricier, `cmid=0`). Domestic benchmark = a **dashed blue line with a pill badge** (`add_hline` + annotation bgcolor). Light gridlines, `bargap=0.45`. Plain `st.plotly_chart` (no highlighter layer); `st.bar_chart` fallback in try/except. → `calculators/calc_import_price.py`.
 - **Analyst Calls — detailed sectioned summary** — each call card now shows, below the headline summary line, a labelled one-line breakdown: **Flats / Longs / Raw materials / Imports & exports / Outlook** (label column + one-line text, styled via `.bm-call-sec*` in `theme.py`). All are **placeholder** copy for now (real per-call commentary to be supplied) — defined in the `CALL_SECTIONS` list in `page_analyst()`; edit/extend that list to change sections. → `app.py` `page_analyst()` + `theme.py`.
 - **Performance week-wise table — Week column removed** — the "Week-wise detail" table dropped its leading `W1/W2/…` column; it now shows **Date | Spot | Forecast | Delta**. (The directional-accuracy KPI/chart are unaffected.) → `app.py` `page_performance()`.
 - **Tabs → animated sliding switch** — the Graphical/Tabular tabs keep the segmented-pill look but the white active pill now **slides** between options instead of snapping. Done by repurposing baseweb's `tab-highlight` (which it repositions inline per active tab) into a full-height white pill + an explicit `transition:left/width .28s` ease; removed the per-tab static white bg/shadow so the sliding pill is the only moving white element; tab buttons raised above it via `z-index`. → `theme.py` tab CSS. (Streamlit only swaps the *panel content* on rerun — that part can't carousel-slide; the **switch indicator** is what animates.)

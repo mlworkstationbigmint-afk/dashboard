@@ -1,5 +1,5 @@
 """
-BigMint - AI Labs : Steel Price Forecasting Model
+BigMint - AI Labs : Price Forecasting: Steel
 Dedicated portal prototype (UI demo) for Adani.
 
 Run:  streamlit run portal/app.py     (from the dashboard base folder)
@@ -17,7 +17,7 @@ import data_loader as dl
 from calculators import calc_import_price, calc_cost, calc_elasticity
 
 st.set_page_config(
-    page_title="Steel Price Forecasting Model",
+    page_title="Price Forecasting: Steel",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -33,7 +33,7 @@ def login_screen():
     with cols[1]:
         with st.container(border=True):
             st.markdown("### Sign in")
-            st.caption("Steel Price Forecasting Model")
+            st.caption("Price Forecasting: Steel")
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
             if st.button("Sign in", use_container_width=True, type="primary"):
@@ -294,7 +294,7 @@ def directional_accuracy_bar(view):
 # PAGE: HOME
 # ---------------------------------------------------------------------------
 def page_home():
-    st.markdown("## Steel Price Forecasting Model")
+    st.markdown("## Price Forecasting: Steel")
     st.markdown(f"Welcome, **{user['name']}**. Six steel products, 12-week Ensemble forecasts and week-wise accuracy.")
     st.write("")
 

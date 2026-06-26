@@ -47,7 +47,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Modules
 - **Home** — overview stats + module cards.
-- **Price forecasting** — Steel only (no tabs): product selector + KPI strip + spot-vs-forecast chart + 12-wk table. (Raw-material tab removed.)
+- **Price forecasting** — Steel only: product selector + KPI strip, then a **Graphical view / Tabular view** tab pair (spot-vs-forecast chart | 12-wk forecast-path table), then a **Forecast rationale** section (placeholder, per-product via `RATIONALES`). (Raw-material tab removed earlier.)
 - **Analyst calls** — PLACEHOLDER cards (no real content yet).
 - **Performance dashboard** — product selector only (window toggle removed); reads **all rows** of `Accuracy_Table_6`. MAPA / directional / avg-delta KPIs, actual-vs-forecast chart + weekly-delta (Rs.) bars + **weekly accuracy % line** + **weekly directional-accuracy bars** + week-wise table.
 - **Calculators** — 3 tools in tabs.
@@ -62,6 +62,8 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 - Products → `data_loader.py` `STEEL_PRODUCTS`
 - Users → `auth.py` `USERS` + `DEMO_CREDENTIALS`
 - Analyst content → `app.py` `page_analyst()` placeholders
+- Forecast rationale text → `app.py` `RATIONALES` dict (add a key per product name; `_default` is the placeholder shown until then)
+- Forecasting Graphical/Tabular tabs → `app.py` `page_forecasting()` `st.tabs([...])` block
 - Data parsing → `data_loader.py`
 - Direction Up/Down/Flat + flat threshold (500) → `data_loader.py` `direction_flag()` / `FLAT_THRESHOLD`
 
@@ -80,6 +82,7 @@ HRC · HR Plate · Rebar BF Mumbai · Rebar IF Mumbai · Rebar IF Raipur · Stru
 
 ## Changelog (prototype iterations)
 ### 2026-06-26
+- **Price forecasting — Graphical/Tabular tabs + Rationale section** — the spot-vs-forecast **chart** and the **12-week forecast-path table** are now split into two `st.tabs(["Graphical view", "Tabular view"])` (Graphical is the default/first tab; flip the order in `page_forecasting()` if Tabular should lead). Below the tabs, a new **"Forecast rationale"** section renders per-product commentary from a module-level `RATIONALES` dict (currently a single `"_default"` **placeholder** with Demand / Supply & cost / Trade & sentiment / Net-view stub bullets) — real analyst text to be supplied later by adding entries keyed by product name. New `notes` icon added to `theme.py` `_ICON_PATHS` for the section heading. → `app.py` `page_forecasting()` + `RATIONALES`, `theme.py`.
 - **MAPA now averaged over the full series (82 wk), not last 16** — the **Home** overview KPI ("Avg absolute accuracy") was computing MAPA on `.tail(16)` of each product and labelled "MAPA, last 16 wk". Removed the `.tail(16)` cap so it averages the full series; label is now dynamic `f"MAPA, {n_weeks}-wk avg"` (currently 82). The **Performance** page already read all rows (no cap) — added the week count to its MAPA sublabel (`f"100 - mean abs % error · {len(view)} wk"`). Week count is computed from the data (`Accuracy_Table_6` = 82 rows/product), not hardcoded, so it self-updates. → `app.py` `page_home()` + `page_performance()`.
 - **Accent flipped to orange** — `primaryColor` in `.streamlit/config.toml` changed `#024CA1` (blue) → `#EE4E24` (orange ACCENT) so **primary buttons (Sign in / Log out / active nav) and tab highlights** all render orange natively, not just via the version-fragile CSS overrides. The brand **topbar stays blue** (uses the `PRIMARY` constant in `theme.py`, independent of `primaryColor`). See updated "Accent = orange" gotcha. NB: `.streamlit/config.toml` is **untracked in git** — this change lives only in the working tree.
 - **Footer co-brand separator `|` → `-`** — footer now reads "© BigMint - Adani · AI Labs" (the `&nbsp;|&nbsp;` before the bigmint.co link is a separate list separator, left as-is). → `theme.py` `footer()`.

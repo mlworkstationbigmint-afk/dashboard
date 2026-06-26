@@ -185,6 +185,7 @@ _ICON_PATHS = {
     "clock":      "<circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/>",
     "factory":    "<path d='M3 21V9l6 4V9l6 4V9l6 4v8z'/>",
     "target":     "<circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3'/>",
+    "notes":      "<rect x='5' y='3' width='14' height='18' rx='2'/><path d='M8 8h8M8 12h8M8 16h5'/>",
 }
 
 

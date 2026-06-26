@@ -309,6 +309,21 @@ def page_home():
     theme.footer()
 
 
+# Placeholder forecast rationales. Real per-product analyst commentary to be supplied later;
+# add an entry keyed by the product name (as in dl.STEEL_PRODUCTS) to override "_default".
+RATIONALES = {
+    "_default": (
+        "<b>Demand</b> &mdash; <i>placeholder.</i> End-use demand drivers (construction, auto, infra "
+        "spending) will be summarised here.<br>"
+        "<b>Supply &amp; cost</b> &mdash; <i>placeholder.</i> Raw-material moves (iron ore, coking coal, "
+        "scrap), mill output and inventory.<br>"
+        "<b>Trade &amp; sentiment</b> &mdash; <i>placeholder.</i> Imports/exports, landed-cost parity and "
+        "market sentiment.<br>"
+        "<b>Net view</b> &mdash; <i>placeholder.</i> How the above nets out into the 12-week direction shown above."
+    ),
+}
+
+
 # ---------------------------------------------------------------------------
 # PAGE: PRICE FORECASTING
 # ---------------------------------------------------------------------------
@@ -340,30 +355,45 @@ def page_forecasting():
         last_actual, last_date = None, None
 
     st.write("")
-    theme.section_title("Spot vs forecast (12-week ahead)", theme.icon("trending"))
-    acc_hist = dl.load_accuracy("16-week", meta["acc"])
-    forecast_chart(acc_hist, fwd)
-    st.markdown("<div class='bm-footnote'>Light blue = actual spot. Red dashed = model forecast "
-                "(historical fit + 12-week ahead). Hover any point for its price.</div>",
-                unsafe_allow_html=True)
+    tab_graph, tab_table = st.tabs(["Graphical view", "Tabular view"])
 
-    theme.section_title("12-week forecast path", theme.icon("calendar"))
-    rows_html = "".join(
-        f"<tr><td>W{int(r.Week)}</td><td>{r.Date:%d %b %Y}</td>"
-        f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
-        f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f}</td>"
-        f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>"
-        for r in fwd.itertuples()
-    )
+    with tab_graph:
+        theme.section_title("Spot vs forecast (12-week ahead)", theme.icon("trending"))
+        acc_hist = dl.load_accuracy("16-week", meta["acc"])
+        forecast_chart(acc_hist, fwd)
+        st.markdown("<div class='bm-footnote'>Light blue = actual spot. Red dashed = model forecast "
+                    "(historical fit + 12-week ahead). Hover any point for its price.</div>",
+                    unsafe_allow_html=True)
+
+    with tab_table:
+        theme.section_title("12-week forecast path", theme.icon("calendar"))
+        rows_html = "".join(
+            f"<tr><td>W{int(r.Week)}</td><td>{r.Date:%d %b %Y}</td>"
+            f"<td class='bm-r'>Rs.{r.Forecast:,.0f}</td>"
+            f"<td class='bm-r'>{'+' if r.Delta>=0 else ''}{r.Delta:,.0f}</td>"
+            f"<td class='bm-c'>{theme.direction_chip(r.Direction)}</td></tr>"
+            for r in fwd.itertuples()
+        )
+        st.markdown(
+            "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
+            "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-r'>&Delta; vs last actual</th>"
+            "<th class='bm-c'>Direction</th></tr></thead>"
+            f"<tbody>{rows_html}</tbody></table>",
+            unsafe_allow_html=True,
+        )
+        st.markdown("<div class='bm-footnote'>Headline line = Ensemble (Weighted Mean). "
+                    "See the <b>Calculators</b> tab for the Import vs Landed-Cost tool.</div>", unsafe_allow_html=True)
+
+    # ---- Forecast rationale (placeholder; real analyst commentary supplied later) ----
+    st.write("")
+    theme.section_title("Forecast rationale", theme.icon("notes"))
+    rationale = RATIONALES.get(product, RATIONALES["_default"])
     st.markdown(
-        "<table class='bm-table'><thead><tr><th>Week</th><th>Date</th>"
-        "<th class='bm-r'>Forecast (Rs./t)</th><th class='bm-r'>&Delta; vs last actual</th>"
-        "<th class='bm-c'>Direction</th></tr></thead>"
-        f"<tbody>{rows_html}</tbody></table>",
+        f"<div class='bm-card'><div class='bm-desc' style='font-size:13.5px;line-height:1.65;'>{rationale}</div></div>",
         unsafe_allow_html=True,
     )
-    st.markdown("<div class='bm-footnote'>Headline line = Ensemble (Weighted Mean). "
-                "See the <b>Calculators</b> tab for the Import vs Landed-Cost tool.</div>", unsafe_allow_html=True)
+    st.markdown("<div class='bm-footnote'>Placeholder rationale &mdash; analyst commentary to be wired in a later phase.</div>",
+                unsafe_allow_html=True)
     theme.footer()
 
 

@@ -122,15 +122,17 @@ div[class*="st-key-home_methodology"] {{ margin-top:16px; }}
 div[class*="st-key-home_methodology"] button {{
     width:100%; min-height:92px; flex-direction:row; align-items:center; justify-content:flex-start;
     gap:18px; text-align:left; white-space:normal; padding:24px 28px; border-radius:18px;
-    border:none !important; color:#fff !important; font-weight:400;
-    background:linear-gradient(120deg,{PRIMARY} 0%,{PRIMARY_DARK} 100%) !important;
-    box-shadow:0 6px 20px rgba(2,76,161,.24); transition:transform .18s ease, box-shadow .18s ease;
+    border:1px solid #e8edf3 !important; color:{PRIMARY_DARK} !important; font-weight:400;
+    background:#fff !important;
+    box-shadow:0 1px 2px rgba(16,24,40,.05);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
 }}
 div[class*="st-key-home_methodology"] button:hover {{
-    transform:translateY(-2px); box-shadow:0 14px 34px rgba(2,76,161,.34);
+    border-color:{PRIMARY} !important; background:{PRIMARY_SOFT} !important;
+    transform:translateY(-2px); box-shadow:0 10px 26px rgba(2,76,161,.12);
 }}
 div[class*="st-key-home_methodology"] button [data-testid="stIconMaterial"] {{
-    font-size:32px !important; width:32px; height:32px; color:#fff;
+    font-size:32px !important; width:32px; height:32px; color:{PRIMARY};
 }}
 /* let the label row stretch so the CTA can sit at the far right */
 div[class*="st-key-home_methodology"] button [data-testid="stMarkdownContainer"] {{ flex:1 1 auto; }}
@@ -138,14 +140,14 @@ div[class*="st-key-home_methodology"] button [data-testid="stMarkdownContainer"]
     display:flex; align-items:center; flex-wrap:wrap; gap:4px 12px; margin:0;
 }}
 div[class*="st-key-home_methodology"] button strong {{
-    font-size:20px; color:#fff; font-weight:800; letter-spacing:.2px;
+    font-size:20px; color:{PRIMARY_DARK}; font-weight:800; letter-spacing:.2px;
 }}
-div[class*="st-key-home_methodology"] button p {{ font-size:13.5px; color:#dce8f8; font-weight:400; }}
-/* "View ->" CTA -> orange pill, pushed to the right, reads as clickable (whole banner navigates) */
+div[class*="st-key-home_methodology"] button p {{ font-size:13.5px; color:{NEUTRAL}; font-weight:400; }}
+/* "View ->" CTA -> solid orange pill, pushed to the right, reads as clickable (whole banner navigates) */
 div[class*="st-key-home_methodology"] button em {{
-    margin-left:auto; font-style:normal; font-weight:800; color:{ACCENT};
-    background:#fff; padding:9px 20px; border-radius:10px; font-size:14px; white-space:nowrap;
-    box-shadow:0 2px 8px rgba(0,0,0,.18);
+    margin-left:auto; font-style:normal; font-weight:800; color:#fff;
+    background:{ACCENT}; padding:9px 20px; border-radius:10px; font-size:14px; white-space:nowrap;
+    box-shadow:0 2px 8px rgba(238,78,36,.30);
 }}
 div[class*="st-key-home_methodology"] button:hover em {{ filter:brightness(.97); }}
 

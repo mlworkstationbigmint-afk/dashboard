@@ -157,23 +157,29 @@ div[class*="st-key-homemod_"] button em {{
 .bm-table-lg thead th {{ padding:14px 18px; font-size:13px; letter-spacing:.3px; text-transform:uppercase; }}
 .bm-table-lg tbody td {{ padding:13px 18px; }}
 
-/* ---------- tabs -> modern segmented pills (orange active) ---------- */
+/* ---------- tabs -> sliding segmented switch (white pill glides to the active tab) ---------- */
 div[data-baseweb="tab-list"] {{
-    gap:6px; background:#e9edf4; padding:5px; border-radius:13px; margin-bottom:6px;
+    position:relative; gap:6px; background:#e9edf4; padding:5px; border-radius:13px; margin-bottom:6px;
     border-bottom:none !important; display:inline-flex; width:auto;
     box-shadow:inset 0 1px 2px rgba(16,24,40,.06);
 }}
+/* baseweb's tab-highlight, repurposed from a bottom underline into a full-height pill.
+   baseweb updates its left/width inline as you switch tabs, so the pill slides; the
+   transition below guarantees the glide regardless of baseweb's defaults. */
+div[data-baseweb="tab-highlight"] {{
+    top:5px !important; bottom:5px !important; height:auto !important; z-index:0 !important;
+    border-radius:9px !important; background:#fff !important;
+    box-shadow:0 1px 4px rgba(16,24,40,.16) !important;
+    transition:left .28s cubic-bezier(.4,0,.2,1), width .28s cubic-bezier(.4,0,.2,1) !important;
+}}
+div[data-baseweb="tab-border"] {{ display:none !important; }}
 button[data-baseweb="tab"] {{
-    font-size:14.5px; font-weight:600; color:{NEUTRAL}; background:transparent;
-    border:none !important; border-radius:9px; padding:9px 26px; margin:0; height:auto;
-    transition:color .15s ease, background .15s ease, box-shadow .15s ease;
+    position:relative; z-index:1; font-size:14.5px; font-weight:600; color:{NEUTRAL};
+    background:transparent !important; border:none !important; border-radius:9px;
+    padding:9px 26px; margin:0; height:auto; transition:color .2s ease;
 }}
-button[data-baseweb="tab"]:hover {{ color:{PRIMARY_DARK}; background:rgba(255,255,255,.55); }}
-button[data-baseweb="tab"][aria-selected="true"] {{
-    color:{ACCENT} !important; background:#fff !important; font-weight:700;
-    box-shadow:0 1px 4px rgba(16,24,40,.16);
-}}
-div[data-baseweb="tab-highlight"], div[data-baseweb="tab-border"] {{ display:none !important; }}
+button[data-baseweb="tab"]:not([aria-selected="true"]):hover {{ color:{PRIMARY_DARK}; }}
+button[data-baseweb="tab"][aria-selected="true"] {{ color:{ACCENT} !important; font-weight:700; }}
 /* segmented selectors (Product) -> orange active */
 button[data-testid="stBaseButton-segmented_controlActive"] {{
     color:{ACCENT} !important; border-color:{ACCENT} !important;

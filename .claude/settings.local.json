@@ -13,7 +13,8 @@
       "Bash(conda run *)",
       "PowerShell(python -m py_compile portal/app.py portal/theme.py)",
       "PowerShell(if \\($?\\) { \"OK - app.py + theme.py compile\" })",
-      "PowerShell(if \\($?\\) { \"OK - both files compile\" })"
+      "PowerShell(if \\($?\\) { \"OK - both files compile\" })",
+      "Bash(python -c ' *)"
     ]
   }
 }

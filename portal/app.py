@@ -275,8 +275,10 @@ def page_home():
     last_dates = pd.to_datetime(summary["Last actual date"], errors="coerce").dropna()
     last_update = last_dates.max().strftime("%d %b %Y") if not last_dates.empty else "-"
     mapas = []
+    n_weeks = 0
     for _, meta in dl.STEEL_PRODUCTS.items():
-        acc = dl.load_accuracy("6-week", meta["acc"]).dropna(subset=["Actual", "Forecast"]).tail(16)
+        acc = dl.load_accuracy("6-week", meta["acc"]).dropna(subset=["Actual", "Forecast"])
+        n_weeks = max(n_weeks, len(acc))
         k = dl.accuracy_kpis(acc)
         if k["mapa"] is not None:
             mapas.append(k["mapa"])
@@ -285,7 +287,7 @@ def page_home():
     s1, s2, s3, s4 = st.columns(4)
     s1.markdown(theme.kpi_card("Steel products", "6", "tracked weekly", theme.icon("factory")), unsafe_allow_html=True)
     s2.markdown(theme.kpi_card("Forecast horizon", "12 wk", "Ensemble Wgt-Mean", theme.icon("trending")), unsafe_allow_html=True)
-    s3.markdown(theme.kpi_card("Avg absolute accuracy", f"{avg_mapa:.1f}%" if avg_mapa else "-", "MAPA, last 16 wk", theme.icon("target")), unsafe_allow_html=True)
+    s3.markdown(theme.kpi_card("Avg absolute accuracy", f"{avg_mapa:.1f}%" if avg_mapa else "-", f"MAPA, {n_weeks}-wk avg", theme.icon("target")), unsafe_allow_html=True)
     s4.markdown(theme.kpi_card("Last actual", last_update, "most recent assessment", theme.icon("calendar")), unsafe_allow_html=True)
 
     st.write("")
@@ -412,7 +414,7 @@ def page_performance():
 
     k1, k2, k3 = st.columns(3)
     k1.markdown(theme.kpi_card("Absolute accuracy (MAPA)",
-                f"{kpis['mapa']:.1f}%" if kpis['mapa'] is not None else "-", "100 - mean abs % error", theme.icon("target")), unsafe_allow_html=True)
+                f"{kpis['mapa']:.1f}%" if kpis['mapa'] is not None else "-", f"100 - mean abs % error · {len(view)} wk", theme.icon("target")), unsafe_allow_html=True)
     k2.markdown(theme.kpi_card("Directional accuracy",
                 f"{kpis['dir_acc']:.0f}%" if kpis['dir_acc'] is not None else "-", "correct up/down/flat calls", theme.icon("gauge")), unsafe_allow_html=True)
     k3.markdown(theme.kpi_card("Average delta",

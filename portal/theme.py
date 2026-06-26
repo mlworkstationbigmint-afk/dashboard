@@ -118,25 +118,36 @@ div[class*="st-key-homemod_"] button em {{
 }}
 
 /* ---------- home Methodology banner (full-width button spanning the 4 cards) ---------- */
-div[class*="st-key-home_methodology"] {{ margin-top:14px; }}
+div[class*="st-key-home_methodology"] {{ margin-top:16px; }}
 div[class*="st-key-home_methodology"] button {{
-    width:100%; min-height:62px; flex-direction:row; align-items:center; justify-content:flex-start;
-    gap:14px; text-align:left; white-space:normal; padding:16px 24px; border-radius:16px;
+    width:100%; min-height:92px; flex-direction:row; align-items:center; justify-content:flex-start;
+    gap:18px; text-align:left; white-space:normal; padding:24px 28px; border-radius:18px;
     border:none !important; color:#fff !important; font-weight:400;
     background:linear-gradient(120deg,{PRIMARY} 0%,{PRIMARY_DARK} 100%) !important;
-    box-shadow:0 4px 16px rgba(2,76,161,.20); transition:transform .18s ease, box-shadow .18s ease;
+    box-shadow:0 6px 20px rgba(2,76,161,.24); transition:transform .18s ease, box-shadow .18s ease;
 }}
 div[class*="st-key-home_methodology"] button:hover {{
-    transform:translateY(-2px); box-shadow:0 12px 28px rgba(2,76,161,.30);
+    transform:translateY(-2px); box-shadow:0 14px 34px rgba(2,76,161,.34);
 }}
 div[class*="st-key-home_methodology"] button [data-testid="stIconMaterial"] {{
-    font-size:26px !important; width:26px; height:26px; color:#fff;
+    font-size:32px !important; width:32px; height:32px; color:#fff;
 }}
-div[class*="st-key-home_methodology"] button strong {{ font-size:16px; color:#fff; font-weight:700; }}
-div[class*="st-key-home_methodology"] button p {{ font-size:13px; color:#dce8f8; margin:0; font-weight:400; }}
+/* let the label row stretch so the CTA can sit at the far right */
+div[class*="st-key-home_methodology"] button [data-testid="stMarkdownContainer"] {{ flex:1 1 auto; }}
+div[class*="st-key-home_methodology"] button [data-testid="stMarkdownContainer"] p {{
+    display:flex; align-items:center; flex-wrap:wrap; gap:4px 12px; margin:0;
+}}
+div[class*="st-key-home_methodology"] button strong {{
+    font-size:20px; color:#fff; font-weight:800; letter-spacing:.2px;
+}}
+div[class*="st-key-home_methodology"] button p {{ font-size:13.5px; color:#dce8f8; font-weight:400; }}
+/* "View ->" CTA -> orange pill, pushed to the right, reads as clickable (whole banner navigates) */
 div[class*="st-key-home_methodology"] button em {{
-    font-style:normal; font-weight:700; color:#fff; font-size:13px; letter-spacing:.3px;
+    margin-left:auto; font-style:normal; font-weight:800; color:{ACCENT};
+    background:#fff; padding:9px 20px; border-radius:10px; font-size:14px; white-space:nowrap;
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
 }}
+div[class*="st-key-home_methodology"] button:hover em {{ filter:brightness(.97); }}
 
 /* ---------- direction chips ---------- */
 .dir-chip {{ font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; white-space:nowrap; display:inline-block; }}

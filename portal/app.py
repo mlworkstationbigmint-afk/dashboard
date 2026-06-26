@@ -336,8 +336,7 @@ def page_home():
                 st.rerun()
 
     # full-width banner button spanning the four module cards -> Methodology
-    if st.button("**Methodology** — how the forecasts are built: data, models, ensemble, "
-                 "accuracy & governance. *View →*",
+    if st.button("**Methodology** — how the forecasts are built: data, models, ensemble & accuracy. *View →*",
                  key="home_methodology", icon=":material/schema:", use_container_width=True):
         st.session_state.page = "Methodology"
         st.rerun()
